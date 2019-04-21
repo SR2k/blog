@@ -5,7 +5,7 @@
 # Site
 title: SR2k
 subtitle:
-description:
+description: Siyuan 先生の日常杂杂碎
 keywords:
 author: Siyuan Cao
 language: zh-hans
@@ -73,7 +73,7 @@ pagination_dir: page
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-theme: next
+theme: indigo
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html
@@ -81,3 +81,29 @@ deploy:
   type: git
   repo: git@github.com:SR2k/blog.git
   branch: gh-pages
+
+# RSS
+feed:
+  type: atom
+  path: atom.xml
+  limit: 0
+
+# JSON
+jsonContent:
+  meta: false
+  pages: false
+  posts:
+    title: true
+    date: true
+    path: true
+    text: true
+    raw: false
+    content: false
+    slug: false
+    updated: false
+    comments: false
+    link: false
+    permalink: false
+    excerpt: false
+    categories: false
+    tags: true
