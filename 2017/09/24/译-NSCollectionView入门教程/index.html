@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>【译】NSCollectionView 入门教程 | SR2k</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#F37327">
+    
+    
+    <meta name="keywords" content="翻译,Ray Wenderlich,macOS,Swift">
+    <meta name="description" content="本文翻译自 raywenderlich.com 的 NSCollectionView Tutorial，已咨询对方网站，可至多翻译 10 篇文章。希望各位有英语阅读能力的话，还是先打赏然后去阅读英文原吧，毕竟无论是 Xcode，抑或是官方的文档，还是各种最前沿的资讯都只有英文版本。综上，此翻译版本仅供参考，谢绝转载。  更新信息： 此 NSCollectionView 教程已由 Gabriel">
+<meta name="keywords" content="翻译,Ray Wenderlich,macOS,Swift">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【译】NSCollectionView 入门教程">
+<meta property="og:url" content="https://sr2k.top/blog/2017/09/24/译-NSCollectionView入门教程/index.html">
+<meta property="og:site_name" content="SR2k">
+<meta property="og:description" content="本文翻译自 raywenderlich.com 的 NSCollectionView Tutorial，已咨询对方网站，可至多翻译 10 篇文章。希望各位有英语阅读能力的话，还是先打赏然后去阅读英文原吧，毕竟无论是 Xcode，抑或是官方的文档，还是各种最前沿的资讯都只有英文版本。综上，此翻译版本仅供参考，谢绝转载。  更新信息： 此 NSCollectionView 教程已由 Gabriel">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-6db9bff0a7b673ec.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-213e3900e938a253.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-283174b11475b7cb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-ef6b2cfd384dd183.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-cc118c34a1553151.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-bd89941692bf5bba.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-a96ea28b4e1256e7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-6fe7039d2d1a1b21.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-705deb60d6892d5a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-b9359a0cde32671d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-7edf2b2db9985f31.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-da794ce70a3f8239.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-2cebd9643e49bae7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-8662823f27453bff.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-3589ffea0a0ecce4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-dd778a91d505a2e1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-865306100dff432a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-111e8db6987f691b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-7fb81eeed145f612.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-1422559e2aea84ef.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-b811bef73ed6329e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-14190a9187e4912b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-a2538c0d623bc2e6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-6656f84c5d2c2726.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-15e1753a88dfc587.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-fb004f710558b192.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-d7f8fd4c5b749b7e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-219024e618e0e957.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-7293eacf2ad306dc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-68e5abf430d026b7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-e295106e936e58cc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-d7c86df41a0aac39.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-93f6bc53d834485e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-c413394c21316342.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-f84ecab7bba30633.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2019-07-19T05:03:34.684Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【译】NSCollectionView 入门教程">
+<meta name="twitter:description" content="本文翻译自 raywenderlich.com 的 NSCollectionView Tutorial，已咨询对方网站，可至多翻译 10 篇文章。希望各位有英语阅读能力的话，还是先打赏然后去阅读英文原吧，毕竟无论是 Xcode，抑或是官方的文档，还是各种最前沿的资讯都只有英文版本。综上，此翻译版本仅供参考，谢绝转载。  更新信息： 此 NSCollectionView 教程已由 Gabriel">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/5477931-6db9bff0a7b673ec.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+    
+        <link rel="alternate" type="application/atom+xml" title="SR2k" href="/blog/atom.xml">
+    
+    <link rel="shortcut icon" href="/blog/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="data:image/jpeg;base64,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">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Siyuan Cao</h5>
+          <a href="mailto:seeran@outlook.com" title="seeran@outlook.com" class="mail">seeran@outlook.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                存档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/SR2k" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://weibo.com/234970213" target="_blank" >
+                <i class="icon icon-lg icon-weibo"></i>
+                Weibo
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://sr2k.top"  >
+                <i class="icon icon-lg icon-male"></i>
+                简历
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">【译】NSCollectionView 入门教程</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">【译】NSCollectionView 入门教程</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2017-09-24T14:34:11.000Z" itemprop="datePublished" class="page-time">
+  2017-09-24
+</time>
+
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#准备开始"><span class="post-toc-number">1.</span> <span class="post-toc-text">准备开始</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#起步代码"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">起步代码</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Model"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">Model</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Controller"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">Controller</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Collection-View-幕后探秘"><span class="post-toc-number">2.</span> <span class="post-toc-text">Collection View 幕后探秘</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#布局"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">布局</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#Collection-View-Item"><span class="post-toc-number">2.1.1.</span> <span class="post-toc-text">Collection View Item</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#额外的-View"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">额外的 View</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Collection-View-的数据源和代理（Data-Source-and-Delegates）"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">Collection View 的数据源和代理（Data Source and Delegates）</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#创建-Collection-View"><span class="post-toc-number">3.</span> <span class="post-toc-text">创建 Collection View</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#调整-Collection-View-的布局"><span class="post-toc-number">3.1.</span> <span class="post-toc-text">调整 Collection View 的布局</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#创建一个-Collection-View-Item"><span class="post-toc-number">4.</span> <span class="post-toc-text">创建一个 Collection View Item</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#向-View-中添加-Control"><span class="post-toc-number">5.</span> <span class="post-toc-text">向 View 中添加 Control</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#向-Nib-中添加-CollectionViewItem-并连接-Outlets"><span class="post-toc-number">6.</span> <span class="post-toc-text">向 Nib 中添加 CollectionViewItem 并连接 Outlets</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#填充-Collection-View"><span class="post-toc-number">7.</span> <span class="post-toc-text">填充 Collection View</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#设置数据源"><span class="post-toc-number">8.</span> <span class="post-toc-text">设置数据源</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#故障排除"><span class="post-toc-number">8.1.</span> <span class="post-toc-text">故障排除</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Model-发生改变时重新加载-Item-们"><span class="post-toc-number">9.</span> <span class="post-toc-text">Model 发生改变时重新加载 Item 们</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#添加分区"><span class="post-toc-number">10.</span> <span class="post-toc-text">添加分区</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#添加分区标题"><span class="post-toc-number">11.</span> <span class="post-toc-text">添加分区标题</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#实现数据源和代理方法"><span class="post-toc-number">11.1.</span> <span class="post-toc-text">实现数据源和代理方法</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#固定标题"><span class="post-toc-number">12.</span> <span class="post-toc-text">固定标题</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Collection-View-的选择功能"><span class="post-toc-number">13.</span> <span class="post-toc-text">Collection View 的选择功能</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#下一步该做些啥？"><span class="post-toc-number">14.</span> <span class="post-toc-text">下一步该做些啥？</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-译-NSCollectionView入门教程"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">【译】NSCollectionView 入门教程</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2017-09-24 22:34:11" datetime="2017-09-24T14:34:11.000Z"  itemprop="datePublished">2017-09-24</time>
+
+            
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>本文翻译自 <a href="https://www.raywenderlich.com/" target="_blank" rel="noopener">raywenderlich.com</a> 的 <a href="https://www.raywenderlich.com/145978/nscollectionview-tutorial" target="_blank" rel="noopener">NSCollectionView Tutorial</a>，已咨询对方网站，可至多翻译 10 篇文章。<br>希望各位有英语阅读能力的话，还是<del>先打赏</del>然后去阅读英文原吧，毕竟无论是 Xcode，抑或是官方的文档，还是各种最前沿的资讯都只有英文版本。<br>综上，此翻译版本仅供参考，<strong>谢绝转载</strong>。</p>
+</blockquote>
+<p><strong>更新信息：</strong> 此 NSCollectionView 教程已由 Gabriel Miro 更新至 Xcode 8 和 Swift 3.</p>
+<p>Collection View 是现实一系列相同类型数据的最佳方式。Mac 中自带的 Finder 和 Photos 就是使用了它：通过一个 Collection View 来展示所有的文件和图片。</p>
+<p><code>NSCollectionView</code> 最早在 OS X 10.5 被推出，它可以非常方便地布局一组具有相同大小的 item，并把它们展示在一个可以滑动的 Scroll View 中。</p>
+<p>在 OS X 10.11 El Capitan 中，参照 iOS 上的 <code>UICollectionView</code>，<code>NSCollectionView</code> 被全面进行了升级。</p>
+<p>macOS 10.12 Sierra 则给予了它「收起分区」（就像 Finder 里那样）和「固定标题」两项新功能，使得它和 iOS 的差距进一步减小了。</p>
+<p>在这个 NSCollectionView 的入门教程中，你将会创造一个叫 <strong>SlideMagic</strong> 的 app，它是一个只属于你的网格状的图片浏览 app。</p>
+<p>这个教程假定你已经基本了解过了 macOS app 的开发，如果你还不曾了解过，raywenderlich.com 上提供了很多很棒的 <a href="http://www.raywenderlich.com/category/macos" target="_blank" rel="noopener">macOS 开发教程</a>，你可以先去看看那些。</p>
+<blockquote>
+<p>当然还有<a href="http://www.jianshu.com/p/a3f16178a213" target="_blank" rel="noopener">我自己翻的《零基础 macOS 应用开发教程》</a>系列</p>
+</blockquote>
+<h1 id="准备开始"><a href="#准备开始" class="headerlink" title="准备开始"></a>准备开始</h1><p>你将会编写的 <strong>SlidesMagic</strong> app 是一个简单的图片浏览器，它很酷，但是，可别因为它太酷了而一不小心在把玩的时候把自己 Mac 上的照片删了哦😛～</p>
+<p>这个 app 会从获取一个文件夹里的所有图片，然后用一个极其优雅的 Collection View 来把它们显示出来。完成了的 app 长这样：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-6db9bff0a7b673ec.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p><a href="https://koenig-media.raywenderlich.com/uploads/2016/10/SlidesMagic8V2-Starter.zip" target="_blank" rel="noopener">下载这个项目的起步代码</a>，编译并运行:</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-213e3900e938a253.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>此时，这个 app 看起来只是一个空荡荡的窗口，但这些起步代码包含了一些「隐藏功能」，这是后面使它成为一个图片浏览器的基础。</p>
+<p><strong>SlidesMagic</strong> 启动的时候，会自动加载系统中 <strong>Desktop Pictures</strong> 目录下的所有图片，在 Xcode 的控制台输出中，我们可以看到这些文件的名字。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-283174b11475b7cb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>控制台中输出的列表表明，起步代码中 Model 的加载逻辑代码已经可以正常工作了，你可以在这个 app 的 <strong>File</strong> → <strong>Open Another Folder…</strong> 菜单中打开另一个目录。</p>
+<h2 id="起步代码"><a href="#起步代码" class="headerlink" title="起步代码"></a>起步代码</h2><p>起步代码提供了一些与 Collection Views 无直接关联的代码。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-ef6b2cfd384dd183.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<h2 id="Model"><a href="#Model" class="headerlink" title="Model"></a>Model</h2><ul>
+<li><strong>ImageFile.swift</strong>: 用于描述一个图片文件</li>
+<li><strong>ImageDirectoryLoader.swift</strong>: 用来把图片从硬盘中加载出来的 Helper 类</li>
+</ul>
+<h2 id="Controller"><a href="#Controller" class="headerlink" title="Controller"></a>Controller</h2><p>这个 app 拥有两个主要的 Controller：</p>
+<ul>
+<li><strong>WindowController.swift</strong>：<ul>
+<li><code>windowDidLoad()</code>：在左半边的屏幕上设置主窗口的大小；</li>
+<li><code>openAnotherFolder(_:)</code>：提供一个标准的「打开」对话框来供用户选择文件夹；</li>
+</ul>
+</li>
+<li><strong>ViewController.swift</strong>：<ul>
+<li><code>viewDidLoad()</code> 打开 Desktop Pictures 目录作为默认目录。</li>
+</ul>
+</li>
+</ul>
+<h1 id="Collection-View-幕后探秘"><a href="#Collection-View-幕后探秘" class="headerlink" title="Collection View 幕后探秘"></a>Collection View 幕后探秘</h1><p><code>NSCollectionView</code> 是今天的主角，它将会在几个关键的组成部分的帮助下，显示许多 item。</p>
+<h2 id="布局"><a href="#布局" class="headerlink" title="布局"></a>布局</h2><p><code>NSCollectionViewLayout</code>：明确了 Collection View 的布局方式，它是一个抽象的类，所有用来表示 CollectionView 布局的实类都继承自它。</p>
+<p><code>NSCollectionViewFlowLayout</code>：提供了一个灵活的网格状的布局。对于绝大多数 app，这种布局方式都适用。</p>
+<p><code>NSCollectionViewGridLayout</code>：为了兼容 OS X 10.11 和以前的版本所保留的布局方式，对于新创建的 app 不推荐使用。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-cc118c34a1553151.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p><strong>Section 和 <code>IndexPath</code></strong>：前者允许你把 item 分成若干个 section（分区），每个 section 包含了一组有序的 item。每个 item 都和一个索引相关联，这个索引是一个由一对整数（section，item）构成的 <code>IndexPath</code> 实例。默认情况下，当你不需要给 item 分区时，这个 Collection View 仍然会拥有一个 section。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-bd89941692bf5bba.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<h3 id="Collection-View-Item"><a href="#Collection-View-Item" class="headerlink" title="Collection View Item"></a>Collection View Item</h3><p>就像其他许多 <strong>Cocoa</strong> 框架一样，Collection View 中的 item 也遵守着 <strong>MVC</strong> 设计模式。</p>
+<p><strong>Model 和 View</strong>：这个 item 的内容来自 Model 的数据对象。每个单独的对象都通过在 Collection View 中创建自己的 View 来把自己显示出来。这些 View 的结构由一个单独的 nib 文件（文件扩展名是 .xib）来定义。</p>
+<p><strong>Controller</strong>：上面提到的 nib 文件是一个由 <strong>NSCollectionViewItem</strong> 管理的 <code>NSViewController</code> 的子类。它负责与 Model 对象进行通信并控制 Collection View 的显示。通常情况下，你会编写一个 <code>NSCollectionViewItem</code> 的子类。当你需要不同类型的 item 的时候，你需要为每个分支定义一个不同的子类，并创建一个 nib。</p>
+<h2 id="额外的-View"><a href="#额外的-View" class="headerlink" title="额外的 View"></a>额外的 View</h2><p>要在 Collection View 中显示不同于普通 item 额外的信息，你需要额外的 item。</p>
+<p>最直观的例子就是分区的标题和脚注。</p>
+<h2 id="Collection-View-的数据源和代理（Data-Source-and-Delegates）"><a href="#Collection-View-的数据源和代理（Data-Source-and-Delegates）" class="headerlink" title="Collection View 的数据源和代理（Data Source and Delegates）"></a>Collection View 的数据源和代理（Data Source and Delegates）</h2><ul>
+<li><code>NSCollectionViewDataSource</code>：用 item 和额外的 item 来填充 Collection View。</li>
+<li><code>NSCollectionViewDelegate</code>：处理拖放相关的事件，以及选中状态和高亮。</li>
+<li><code>NSCollectionViewDelegateFlowLayout</code>：允许你自定义你的网格视图。</li>
+</ul>
+<blockquote>
+<p><strong>注意</strong>：填充一个 Collection View 的方法有二：数据源和 Cocoa 绑定。这个教程将会使用数据源。</p>
+</blockquote>
+<h1 id="创建-Collection-View"><a href="#创建-Collection-View" class="headerlink" title="创建 Collection View"></a>创建 Collection View</h1><p>打开 <strong>Main.storyboard</strong>。前往<strong>控件库</strong>，向 <strong>View Controller Scene</strong> 中拖动一个 <strong>Collection View</strong>。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-a96ea28b4e1256e7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<blockquote>
+<p><strong>注意</strong>：你或许注意到了，<strong>Interface Builder</strong> 为我们添加了三个 View，而不是一个。这是因为 <strong>Collection View</strong> 是嵌入在一个 <strong>Scroll View</strong> 中的，而后者又自带一个 <strong>Clip View</strong> 子视图。这仨视图各不相同，因此当本教程需要你选择 <strong>Collection View</strong> 的时候，切记不要错选了 <strong>Scroll View</strong> 或 <strong>Clip View</strong>。</p>
+</blockquote>
+<p>调整 <strong>Bordered Scroll View</strong> 的大小，使它填满它的父视图的所有空间。然后选择 Xcode 菜单栏上的 <strong>Editor</strong> → <strong>Resolve Auto Layout Issues</strong> → <strong>Add Missing Constraints</strong> 来添加 <strong>Auto Layout</strong> 约束条件。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-6fe7039d2d1a1b21.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>你需要在 <strong>ViewController</strong> 中添加一个 Outlet 来访问界面上的 Collection View。打开 <strong>ViewController.swift</strong>，在 <code>ViewController</code> 类的定义中添加以下代码：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@IBOutlet</span> <span class="keyword">weak</span> <span class="keyword">var</span> collectionView: <span class="type">NSCollectionView!</span></span><br></pre></td></tr></table></figure>
+<p>打开 <strong>Main.storyboard</strong>，并选择 <strong>View Controller Scene</strong> 中的 <strong>View Controller</strong>。</p>
+<p>打开<strong>连接检查器</strong>，在 <strong>Outlets</strong> 部分中找到 <strong>collectionView</strong>，<strong>拖动</strong>它旁边的小圆圈到画布中的 Collection View 上。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-705deb60d6892d5a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<h2 id="调整-Collection-View-的布局"><a href="#调整-Collection-View-的布局" class="headerlink" title="调整 Collection View 的布局"></a>调整 Collection View 的布局</h2><p>你现在有两种选择：在 <strong>Interface Builder</strong> 中设置好主要的布局属性，或者在代码中手动编写。</p>
+<p>在 SlidesMagic 这个项目中，我们选择手动编写代码。</p>
+<p>打开 <strong>ViewController.swift</strong>，把这些方法添加到 <code>ViewController</code> 中：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">fileprivate</span> <span class="function"><span class="keyword">func</span> <span class="title">configureCollectionView</span><span class="params">()</span></span> &#123;</span><br><span class="line">  <span class="comment">// 1</span></span><br><span class="line">  <span class="keyword">let</span> flowLayout = <span class="type">NSCollectionViewFlowLayout</span>()</span><br><span class="line">  flowLayout.itemSize = <span class="type">NSSize</span>(width: <span class="number">160.0</span>, height: <span class="number">140.0</span>)</span><br><span class="line">  flowLayout.sectionInset = <span class="type">EdgeInsets</span>(top: <span class="number">10.0</span>, <span class="keyword">left</span>: <span class="number">20.0</span>, bottom: <span class="number">10.0</span>, <span class="keyword">right</span>: <span class="number">20.0</span>)</span><br><span class="line">  flowLayout.minimumInteritemSpacing = <span class="number">20.0</span></span><br><span class="line">  flowLayout.minimumLineSpacing = <span class="number">20.0</span></span><br><span class="line">  collectionView.collectionViewLayout = flowLayout</span><br><span class="line">  <span class="comment">// 2</span></span><br><span class="line">  view.wantsLayer = <span class="literal">true</span></span><br><span class="line">  <span class="comment">// 3</span></span><br><span class="line">  collectionView.layer?.backgroundColor = <span class="type">NSColor</span>.black.cgColor</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这些代码的作用是：</p>
+<ol>
+<li>创建一个 <code>NSCollectionViewFlowLayout</code>，配置它的基本属性，并设置 <code>NSCollectionView</code> 的 <code>collectionViewLayout</code>；</li>
+<li>一般情况下，<code>NSCollectionView</code> 是基于层的，所以你需要把它的父视图的 <code>wantsLayer</code> 设置为 <code>true</code>；</li>
+<li>把 Collection View 的背景颜色设置为黑色。</li>
+</ol>
+<p>你需要在试图加载完成时调用这个方法，所以在 <code>viewDidLoad()</code> 方法的最后插入：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">configureCollectionView()</span><br></pre></td></tr></table></figure>
+<p>编译并运行：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-b9359a0cde32671d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>此时，你的 Collection View 已经拥有了一个黑色的背景，并配置好了布局。</p>
+<h1 id="创建一个-Collection-View-Item"><a href="#创建一个-Collection-View-Item" class="headerlink" title="创建一个 Collection View Item"></a>创建一个 Collection View Item</h1><p>先在你需要创建一个 <code>NSCollectionViewItem</code> 的子类并把 Model 里的数据们显示出来。</p>
+<p>点击 Xcode 菜单栏上的 <strong>File</strong> → <strong>New</strong> → <strong>File…</strong>，选择 <strong>macOS</strong> → <strong>Source</strong> → <strong>Cocoa Class</strong> 并点击 <strong>Next</strong>。</p>
+<p>把 <strong>Class</strong> 填写 <strong>CollectionViewItem</strong>，<strong>Subclass of</strong> 填写 <code>NSCollectionViewItem</code>，并勾选 <strong>Also create XIB for user interface</strong>。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-7edf2b2db9985f31.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>点击 <strong>Next</strong>，然后在对话框中的 <strong>Group</strong> 中选择 <strong>Controllers</strong>，并点击 <strong>Create</strong>。</p>
+<p>打开 <strong>CollectionViewItem.swift</strong>，把里边的内容全部替换为：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> Cocoa</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CollectionViewItem</span>: <span class="title">NSCollectionViewItem</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 1</span></span><br><span class="line">  <span class="keyword">var</span> imageFile: <span class="type">ImageFile?</span> &#123;</span><br><span class="line">    <span class="keyword">didSet</span> &#123;</span><br><span class="line">      <span class="keyword">guard</span> isViewLoaded <span class="keyword">else</span> &#123; <span class="keyword">return</span> &#125;</span><br><span class="line">      <span class="keyword">if</span> <span class="keyword">let</span> imageFile = imageFile &#123;</span><br><span class="line">        imageView?.image = imageFile.thumbnail</span><br><span class="line">        textField?.stringValue = imageFile.fileName</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        imageView?.image = <span class="literal">nil</span></span><br><span class="line">        textField?.stringValue = <span class="string">""</span></span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 2</span></span><br><span class="line">  <span class="keyword">override</span> <span class="function"><span class="keyword">func</span> <span class="title">viewDidLoad</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">super</span>.viewDidLoad()</span><br><span class="line">    view.wantsLayer = <span class="literal">true</span></span><br><span class="line">    view.layer?.backgroundColor = <span class="type">NSColor</span>.lightGray.cgColor</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这些代码的功能是：</p>
+<ol>
+<li>定义了 <code>imageFile</code> 属性，用来访问需要展示的 Model 对象。当你为 <code>imageFile</code> 属性赋值时，它的 <code>didSet</code> 属性观察器会设置这个 item 的 Image 和 Label；</li>
+<li>改变此 item 的 View 的背景颜色。</li>
+</ol>
+<h1 id="向-View-中添加-Control"><a href="#向-View-中添加-Control" class="headerlink" title="向 View 中添加 Control"></a>向 View 中添加 Control</h1><p>你在 <strong>CollectionViewItem.swift</strong> 时勾选了「Also create a XIB（同时创建一个 XIB）」，为了更清楚地整理文件，把 <strong>CollectionViewItem.xib</strong> 拖动到 <strong>Main.storyboard</strong> 下方的 <strong>Resources</strong> 分组中。</p>
+<p>Nib 文件中的 <strong>View</strong> 就是每个 item 所显示出来的根视图，你需要添加一个 Image View 来显示图片，以及一个 Label 来显示文件名。</p>
+<p>打开 <strong>CollectionViewItem.xib</strong>，添加一个 <code>NSImageView</code>：</p>
+<ol>
+<li>从<strong>控件库</strong>中拖动一个 <strong>Image View</strong> 到画布上的 <strong>View</strong> 中；<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-da794ce70a3f8239.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure></li>
+<li>在 <strong>Auto Layout</strong> 工具栏中点击 <strong>Pin</strong> 按钮来设置它的约束条件；</li>
+<li>设置它的 <strong>top</strong>、<strong>leading</strong> 和 <strong>trailing</strong> 约束为 0，<strong>bottom</strong> 为 30。点击 <strong>Update Frames: Items of New Constraints</strong> 然后点击 <strong>Add 4 Constraints</strong>。<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-2cebd9643e49bae7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+</li>
+</ol>
+<p>再来添加一个 Label：</p>
+<ol>
+<li>从<strong>控件库</strong>中拖动一个 <strong>Label</strong> 到画布上的 <strong>Image View</strong> 的下方；<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-8662823f27453bff.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure></li>
+<li>在 <strong>Auto Layout</strong> 工具栏中点击 <strong>Pin</strong> 按钮，设置它的 <strong>top</strong>、<strong>bottom</strong>、<strong>leading</strong> 和 <strong>trailing</strong> 约束都为 0。点击 <strong>Update Frames: Items of New Constraints</strong> 然后点击 <strong>Add 4 Constraints</strong>。<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-3589ffea0a0ecce4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+</li>
+</ol>
+<p>选中 <strong>Label</strong>，在<strong>属性检查器</strong>中设置如下属性：</p>
+<ol>
+<li>设置 <strong>Alignment</strong> 为 <strong>center</strong></li>
+<li>设置 <strong>Text Color</strong> 为 <strong>white</strong></li>
+<li>设置 <strong>Line Break</strong> 为 <strong>Truncate Tail</strong><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-dd778a91d505a2e1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+</li>
+</ol>
+<h1 id="向-Nib-中添加-CollectionViewItem-并连接-Outlets"><a href="#向-Nib-中添加-CollectionViewItem-并连接-Outlets" class="headerlink" title="向 Nib 中添加 CollectionViewItem 并连接 Outlets"></a>向 Nib 中添加 CollectionViewItem 并连接 Outlets</h1><p>尽管 Nib 文件的 <strong>File’s Owner</strong> 现在是 <code>CollectionViewItem</code>，它还只是一个占位符。当 Nib 文件被实例化时，它还会需要一个「真正的」<code>NSCollectionViewItem</code> 的实例。</p>
+<p>从<strong>控件库</strong>中拖动一个 <strong>Collection View Item</strong> 到<strong>文档大纲</strong>中，选中它，在 <strong>身份检查器</strong>中把它的 <strong>Class</strong> 设置为 <code>CollectionViewItem</code>。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-865306100dff432a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>在 xib 中，你需要把 View 的层次关系连接到 <strong>CollectionViewItem</strong> 的 Outlet 中，在 <strong>CollectionViewItem.xib</strong> 中：</p>
+<ol>
+<li>选中 <strong>Collection View Item</strong> 并前往 <strong>Connections Inspector</strong>；</li>
+<li>把 <code>view</code> 的 outlet 拖动到<strong>文档大纲</strong>中的 <strong>View</strong> 上；</li>
+<li>用同样的方法，把 <code>imageView</code> 和 <code>textField</code> 的 outlet 连接到<strong>文档大纲</strong>中的 <strong>Image View</strong> 和 <strong>Label</strong> 中。<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-111e8db6987f691b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+</li>
+</ol>
+<h1 id="填充-Collection-View"><a href="#填充-Collection-View" class="headerlink" title="填充 Collection View"></a>填充 Collection View</h1><p>你需要实现 Collection View 的数据源协议，说人话就是：</p>
+<ol>
+<li>Collection 中有几个分区？</li>
+<li>每个分区分别有多少个 item？</li>
+<li>某个索引路径（Index Path）对应的是哪个 Item？</li>
+</ol>
+<p>打开 <strong>ViewController.swift</strong> 并在文件的末尾添加这些扩展代码：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">extension</span> <span class="title">ViewController</span> : <span class="title">NSCollectionViewDataSource</span> </span>&#123;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 1</span></span><br><span class="line">  <span class="function"><span class="keyword">func</span> <span class="title">numberOfSections</span><span class="params">(<span class="keyword">in</span> collectionView: NSCollectionView)</span></span> -&gt; <span class="type">Int</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> imageDirectoryLoader.numberOfSections</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 2</span></span><br><span class="line">  <span class="function"><span class="keyword">func</span> <span class="title">collectionView</span><span class="params">(<span class="number">_</span> collectionView: NSCollectionView, numberOfItemsInSection section: Int)</span></span> -&gt; <span class="type">Int</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> imageDirectoryLoader.numberOfItemsInSection(section)</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 3</span></span><br><span class="line">  <span class="function"><span class="keyword">func</span> <span class="title">collectionView</span><span class="params">(<span class="number">_</span> itemForRepresentedObjectAtcollectionView: NSCollectionView, itemForRepresentedObjectAt indexPath: IndexPath)</span></span> -&gt; <span class="type">NSCollectionViewItem</span> &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 4</span></span><br><span class="line">    <span class="keyword">let</span> item = collectionView.makeItem(withIdentifier: <span class="string">"CollectionViewItem"</span>, <span class="keyword">for</span>: indexPath)</span><br><span class="line">    <span class="keyword">guard</span> <span class="keyword">let</span> collectionViewItem = item <span class="keyword">as</span>? <span class="type">CollectionViewItem</span> <span class="keyword">else</span> &#123;<span class="keyword">return</span> item&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 5</span></span><br><span class="line">    <span class="keyword">let</span> imageFile = imageDirectoryLoader.imageFileForIndexPath(indexPath)</span><br><span class="line">    collectionViewItem.imageFile = imageFile</span><br><span class="line">    <span class="keyword">return</span> item</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ol>
+<li>如果你的 app 不需要用到分区，那么你可以删除这个方法，因为一个分区就够了；</li>
+<li>这是两个 <code>NSCollectionViewDataSource</code> 协议必须实现的方法之一，在这个方法中你需要返回某个分区容纳的 item 的数量；</li>
+<li>另一个必须实现的方法，这个方法会针对某个 <code>indexPath</code> 返回一个 item；</li>
+<li>这个方法会从 nib 中实例化一个 item，这个 item 的名字是 <code>identifier</code> 参数，它会根据所需要的 item 的类型来试图重复使用一个 item，如果没有 item 可供重复使用，它会新建一个 item；</li>
+<li>根据 <code>IndexPath</code> 获取 Model 对象，设置 Image 和 Label 的内容。</li>
+</ol>
+<blockquote>
+<p><strong>注意</strong>: Collection View 具有一项能力：循环使用已经生成了的 Item，以此来减轻数据源过大时的内存压力。从界面上移出去的 item 就是被重复使用的 item。</p>
+</blockquote>
+<h1 id="设置数据源"><a href="#设置数据源" class="headerlink" title="设置数据源"></a>设置数据源</h1><p>接下来我发需要定义数据源：</p>
+<p>打开 <strong>Main.storyboard</strong>，选中 Collection View。</p>
+<p>打开<strong>连接检查器</strong>，在 <strong>Outlets</strong> 部分中找到 <strong>dataSource</strong>，<strong>拖动</strong>它旁边的小圆圈到<strong>文档大纲</strong>里的 <strong>View Controller</strong> 上。<br><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-7fb81eeed145f612.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure></p>
+<p>编译并运行，你的 Collection View 现在应该能显示 <strong>Desktop Pictures</strong> 目录中的图片了：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-1422559e2aea84ef.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>哈哈哈，折腾了半天都是值得的✌️～</p>
+<h2 id="故障排除"><a href="#故障排除" class="headerlink" title="故障排除"></a>故障排除</h2><p>如果你还看不见任何图片，你可能遗漏了一些小细节：</p>
+<ol>
+<li>你在<strong>连接检查器</strong>中正确地设置了所有的连接吗？</li>
+<li>你设置 <code>dataSource</code> 的 Outlet 了吗？</li>
+<li>你在<strong>身份检查器</strong>中应用正确的自定义类了吗？</li>
+<li>你添加顶层的 <code>NSCollectionViewItem</code>，并把它的类设置为 <code>CollectionViewItem</code> 了吗？</li>
+<li><code>makeItemWithIdentifier</code> 中的 <code>identifier</code> 参数的值和 nib 的名字一样吗？</li>
+</ol>
+<h1 id="Model-发生改变时重新加载-Item-们"><a href="#Model-发生改变时重新加载-Item-们" class="headerlink" title="Model 发生改变时重新加载 Item 们"></a>Model 发生改变时重新加载 Item 们</h1><p>要显示另一个目录中的图片，你可以在 app 的菜单栏上点击 <strong>File</strong> → <strong>Open Another Folder…</strong>，然后选择一个存有 <strong>JPG</strong> 或 <strong>PNG</strong> 格式的图片的目录。</p>
+<p>但时此时窗口中的东西似乎什么变化都没有，还是显示着 <strong>Desktop Pictures</strong> 目录中的图片。尽管 Xcode 里的控制台中已经打印出了新目录里的文件名称。</p>
+<p>你需要调用 Collection View 的 <code>reloadData()</code> 方法来刷新它的 item。</p>
+<p>打开 <strong>ViewController.swift</strong> 并把这些代码添加到 <code>loadDataForNewFolderWithUrl(_:)</code> 方法中：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">collectionView.reloadData()</span><br></pre></td></tr></table></figure>
+<p>编译并运行，现在你应该能看到窗口中已经能显示正确的照片了。</p>
+<h1 id="添加分区"><a href="#添加分区" class="headerlink" title="添加分区"></a>添加分区</h1><p>SlidesMagic app 现在已经可以做一些很神奇的事儿了，但我们要更进一步 —— 为 Collection View 加入分区。</p>
+<p>首先，你需要在主视图的最底部加入一个复选框，来允许你切换是否启用分组。</p>
+<p>打开 <strong>Main.storyboard</strong>，然后在<strong>文档大纲</strong>中选中 Scroll View 的约束条件，在<strong>尺寸检查器</strong>中吧它的 <strong>Constant</strong> 修改为 30.</p>
+<p>这会把 Collection View 抬高一些些，腾出地方来放置复选框。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-b811bef73ed6329e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>现在，从<strong>控件库</strong>中拖动一个 <strong>Check Box Button</strong>到画布中 Collection View 下方的空间里，选中它，在<strong>属性检查器</strong>中把它的 <strong>Title</strong> 设置为 <strong>Show Sections</strong>，然后把 <strong>State</strong> 设置为 <strong>Off</strong>。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-14190a9187e4912b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>接下来，点击 <strong>Pin</strong> 按钮更新它的 <strong>Auto Layout</strong> 约束条件：<strong>Top</strong> 设置为 8，<strong>Leading</strong> 设置为 20。然后点击 <strong>Update Frames: Items of New Constraints</strong> 和 <strong>Add 2 Constraints</strong></p>
+<p>编译并运行，现在 app 的底部看起来应该是这样的：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-a2538c0d623bc2e6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>当你点击这个复选框的时候，你的 app 需要改变 Collection View 的外观。</p>
+<p>打开 <strong>ViewController.swift</strong> 在 <code>ViewController</code> 类的最后添加这些代码：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@IBAction</span> <span class="function"><span class="keyword">func</span> <span class="title">showHideSections</span><span class="params">(sender: NSButton)</span></span> &#123;</span><br><span class="line">  <span class="keyword">let</span> show = sender.state</span><br><span class="line">  <span class="comment">// 1</span></span><br><span class="line">  imageDirectoryLoader.singleSectionMode = (show == <span class="type">NSOffState</span>)</span><br><span class="line">  <span class="comment">// 2</span></span><br><span class="line">  imageDirectoryLoader.setupDataForUrls(<span class="literal">nil</span>)</span><br><span class="line">  <span class="comment">// 3</span></span><br><span class="line">  collectionView.reloadData()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这些代码会：</p>
+<ol>
+<li>根据复选框的状态切换单一分组/多个分组；</li>
+<li>根据当前选择的模式来调整 Model，此时传递的 <code>nil</code> 参数表示跳过图像加载 —— 毕竟图片还是那些图片，只是布局发生了改变；</li>
+<li>Model 发生了改变，所以需要刷新数据。</li>
+</ol>
+<p>如果你好奇图片是按照是按照什么规则进行分组的，在 <code>ImageDirectoryLoader</code> 中找到 <code>sectionLengthArray</code>，这个数组里的数字设置了各个分组的里最多可以容纳多少个 item。这个数组是随机生成的，只是用来用作演示。</p>
+<p>现在，打开 <strong>Main.storyboard</strong>。在<strong>文档大纲</strong>中<strong>按住 Control⌃ 键的同时</strong>把 <strong>Show Sections</strong> 拖动到 <strong>View Controller</strong> 上。在弹出的黑色窗口中点击 <strong>showHideSections:</strong>。你可以在<strong>连接检查器</strong>里查看你是否连接成功了。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-6656f84c5d2c2726.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>编译并运行，勾选 <strong>Show Sections</strong> 来查看布局的变化。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-15e1753a88dfc587.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>为了更好地区分各个分区，打开 <strong>ViewController.swift</strong>，编辑 <code>configureCollectionView()</code> 方法里的 <code>sectionInset</code> 属性。</p>
+<p>把这一行：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flowLayout.sectionInset = <span class="type">EdgeInsets</span>(top: <span class="number">10.0</span>, <span class="keyword">left</span>: <span class="number">20.0</span>, bottom: <span class="number">10.0</span>, <span class="keyword">right</span>: <span class="number">20.0</span>)</span><br></pre></td></tr></table></figure>
+<p>替换成这个：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flowLayout.sectionInset = <span class="type">EdgeInsets</span>(top: <span class="number">30.0</span>, <span class="keyword">left</span>: <span class="number">20.0</span>, bottom: <span class="number">30.0</span>, <span class="keyword">right</span>: <span class="number">20.0</span>)</span><br></pre></td></tr></table></figure>
+<p>编译并运行，勾选 <strong>Show Sections</strong>，可以看到各个分区之间已经有了分隔。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-fb004f710558b192.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<h1 id="添加分区标题"><a href="#添加分区标题" class="headerlink" title="添加分区标题"></a>添加分区标题</h1><p>另一种区分各个分区边界的方法是为每个分区添加一个标题或脚注。</p>
+<p>你需要一个自定义的 <code>NSView</code> 类，并实现相应的数据源方法来为 Collection View 添加一个标题</p>
+<p>要创建一个标题，在 Xcode 的菜单栏点击 <strong>File</strong> → <strong>New</strong> → <strong>File…</strong>。选择 <strong>macOS</strong> → <strong>User Interface</strong> → <strong>View</strong>，并点击 <strong>Next</strong>。</p>
+<p>文件名输入 <strong>HeaderView.xib</strong>，<strong>Group</strong> 选择 <strong>Resources</strong>。</p>
+<p>点击 <strong>Create</strong>。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-d7f8fd4c5b749b7e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>打开 <strong>HeaderView.xib</strong> 并选中 <strong>Custom View</strong>。在<strong>尺寸检查器</strong>中把 <strong>Width</strong> 设置为 500，<strong>Height</strong> 设置为 40。</p>
+<p>从 <strong>Object Library</strong> 拖动一个 Label 到 <strong>Custom View</strong> 的左半边。打开<strong>属性检查器</strong>，设置它的 <strong>Title</strong> 为 <strong>Section Number</strong>，设置 <strong>Font Size</strong> 为 <strong>16</strong>。</p>
+<p>再拖动一个 Label 到 <strong>Custom View</strong> 的右半边。设置它的 <strong>Title</strong> 为 <strong>Image Count</strong>，设置 <strong>Alignment</strong> 为 <strong>Right</strong>。</p>
+<p>选中 <strong>Section Number</strong> Label，点击 <strong>Pin</strong> 按钮，设置它的 <strong>Top</strong> 约束为 12，<strong>Leading</strong> 约束为 20。点击 <strong>Update Frames: Items of New Constraints</strong> 和 <strong>Add 2 Constraints</strong>。</p>
+<p>接下来，设置 <strong>Image Count</strong> Label 的 <strong>Top</strong> 约束为 11，<strong>Trailing</strong> 约束为 20，别忘了点击 <strong>Update Frames: Items of New Constraints</strong> 和 <strong>Add 2 Constraints</strong>。</p>
+<p>现在我们的标题应该看起来像这样：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-219024e618e0e957.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>现在我们的标题 UI 已经准备好了，我们还需要为它创建一个子类。</p>
+<p>在 Xcode 的菜单栏点击 <strong>File</strong> → <strong>New</strong> → <strong>File…</strong>。选择 <strong>macOS</strong> → <strong>Source</strong> → <strong>Cocoa Class</strong>，并点击 <strong>Next</strong>。把它的类名设置为 <code>HeaderView</code>，并让它继承自 <code>NSView</code>，点击 <strong>Next</strong>，并在 <strong>Group</strong> 中选择 <strong>Views</strong>。点击 <strong>Create</strong>。</p>
+<p>打开 <strong>HeaderView.swift</strong> 然后把里边的所有内容替换为：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 1</span></span><br><span class="line"><span class="meta">@IBOutlet</span> <span class="keyword">weak</span> <span class="keyword">var</span> sectionTitle: <span class="type">NSTextField!</span></span><br><span class="line"><span class="meta">@IBOutlet</span> <span class="keyword">weak</span> <span class="keyword">var</span> imageCount: <span class="type">NSTextField!</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 2</span></span><br><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">func</span> <span class="title">draw</span><span class="params">(<span class="number">_</span> dirtyRect: NSRect)</span></span> &#123;</span><br><span class="line">  <span class="keyword">super</span>.draw(dirtyRect)</span><br><span class="line">  <span class="type">NSColor</span>(calibratedWhite: <span class="number">0.8</span> , alpha: <span class="number">0.8</span>).<span class="keyword">set</span>()</span><br><span class="line">  <span class="type">NSRectFillUsingOperation</span>(dirtyRect, <span class="type">NSCompositingOperation</span>.sourceOver)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里的代码做了这些事儿：</p>
+<ol>
+<li>设置你需要用来连接 nib 元素的 outlet；</li>
+<li>绘制一个灰色的背景。</li>
+</ol>
+<p>要把 outlet 连接至 Label，打开 <strong>HeaderView.xib</strong> 并选中 <strong>Custom View</strong>。在 <strong>Identity Inspector</strong> 中把 <strong>Class</strong> 设置为 <strong>HeaderView</strong>。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-7293eacf2ad306dc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>在<strong>文档大纲</strong>视图中，按住 <strong>Control⌃ 键</strong>的同时点击 <strong>Header View</strong>。在弹出的黑色窗口中，拖动 <strong>imageCount</strong> 到 <strong>Images Count</strong> 上来连接 outlet。 </p>
+<p>对第二个 Label 进行同样的操作，拖动 <strong>sectionTitle</strong> 到画布中的 <strong>Section Number</strong> Label 上。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-68e5abf430d026b7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<h2 id="实现数据源和代理方法"><a href="#实现数据源和代理方法" class="headerlink" title="实现数据源和代理方法"></a>实现数据源和代理方法</h2><p>你的标题已经完全准备好上战场了，你需要实现 <code>collectionView(_:viewForSupplementaryElementOfKind:at:)</code>，把这个标题视图传递给 Collection View：</p>
+<p>打开 <strong>ViewController.swift</strong> 并把这些方法添加到 <code>NSCollectionViewDataSource</code> extension 中：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">collectionView</span><span class="params">(<span class="number">_</span> collectionView: NSCollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath)</span></span> -&gt; <span class="type">NSView</span> &#123;</span><br><span class="line">  <span class="comment">// 1</span></span><br><span class="line">  <span class="keyword">let</span> view = collectionView.makeSupplementaryView(ofKind: <span class="type">NSCollectionElementKindSectionHeader</span>, withIdentifier: <span class="string">"HeaderView"</span>, <span class="keyword">for</span>: indexPath) <span class="keyword">as</span>! <span class="type">HeaderView</span></span><br><span class="line">  <span class="comment">// 2</span></span><br><span class="line">  view.sectionTitle.stringValue = <span class="string">"Section \(indexPath.section)"</span></span><br><span class="line">  <span class="keyword">let</span> numberOfItemsInSection = imageDirectoryLoader.numberOfItemsInSection(indexPath.section)</span><br><span class="line">  view.imageCount.stringValue = <span class="string">"\(numberOfItemsInSection) image files"</span></span><br><span class="line">  <span class="keyword">return</span> view</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Collection View 会在它需要数据源的时候调用这个方法，并为每个分区设置标题。这个方法做了这些：</p>
+<ol>
+<li>调用 <code>makeSupplementaryViewOfKind(_:withIdentifier:for:)</code> 来从 nib 文件实例化一个名字是 <code>withIdentifier</code> 的 <code>HeaderView</code> 对象；</li>
+<li>设置各个 Label 的值。</li>
+</ol>
+<p>在 <strong>ViewController.swift</strong> 的最后，添加这个 <code>NSCollectionViewDelegateFlowLayout</code> 扩展：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">extension</span> <span class="title">ViewController</span> : <span class="title">NSCollectionViewDelegateFlowLayout</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">func</span> <span class="title">collectionView</span><span class="params">(<span class="number">_</span> collectionView: NSCollectionView, layout collectionViewLayout: NSCollectionViewLayout, referenceSizeForHeaderInSection section: Int)</span></span> -&gt; <span class="type">NSSize</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> imageDirectoryLoader.singleSectionMode ? <span class="type">NSZeroSize</span> : <span class="type">NSSize</span>(width: <span class="number">1000</span>, height: <span class="number">40</span>)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面这个方法其实是不是必须的，但当你需要设置标题的时候就必须写上了，因为 Flow Layout（流式布局）的代理需要你提供各个分区的标题的大小。</p>
+<p>如果没有实现这个方法，你将看不到标题，因为它们的尺寸都是 0。此外，它还会忽略你指定的宽度，而是把标题的宽度设置为 Collection View 的宽度。</p>
+<p>在这个例子中，当 Collection View 只有一个分区的时候，这个方法返回的标题尺寸是 0，否则他会返回 40.</p>
+<p>对于使用了 <code>NSCollectionViewDelegateFlowLayout</code> 的 Collection View，你需要把 <code>ViewController</code> 连接到 <code>NSCollectionView</code> 的 <code>delegate</code>。</p>
+<p>打开 <strong>Main.storyboard</strong> 并选中 Collection View。打开<strong>连接检查器</strong>，在 <strong>Outlets</strong> 部分中找到 <strong>delegate</strong>。<strong>拖动</strong>他旁边的小圆点到<strong>文档大纲</strong>中的 View Controller 上。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-e295106e936e58cc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>编译并运行，勾选 <strong>Show Sections</strong>，可以看到一个个标题把分区区分开来：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-d7c86df41a0aac39.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<h1 id="固定标题"><a href="#固定标题" class="headerlink" title="固定标题"></a>固定标题</h1><p>macOS 10.12 中的 <code>NSCollectionViewFlowLayout</code> 新加入了两个属性：<code>sectionHeadersPinToVisibleBounds</code> 和 <code>sectionFootersPinToVisibleBounds</code>。</p>
+<p>当 <code>sectionHeadersPinToVisibleBounds</code> 设置为 <code>true</code>，最上端的分区的标题将会固定在顶端，而不会移出界面以外。当你继续向下滚动时，下一个标题会把它顶走。这种效果一般被称为「sticky headers（固定标题）」或「floating headers（浮动标题）」。</p>
+<p>把 <code>sectionFootersPinToVisibleBounds</code> 设置为 <code>true</code> 则会把脚注固定在底部。</p>
+<p>打开 <strong>ViewController.swift</strong>，在 <code>configureCollectionView()</code> 方法的底部加入这个方法：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flowLayout.sectionHeadersPinToVisibleBounds = <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+<p>编译并运行，勾选 <strong>Show Sections</strong> 并向下滚动一些，你可以看到第一个区域已经有一些图片被移出屏幕了，但标题还是固定在顶部：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-93f6bc53d834485e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<blockquote>
+<p><strong>注意</strong>：如果你的 app 需要支持 OS X 10.11 或更老的版本，你需要通过重写 <code>layoutAttributesForElements(in:)</code> 方法来「手动」实现固定标题。你可以查看[Advanced Collection Views in OS X Tutorial]这篇教程（我正在翻译～）。</p>
+</blockquote>
+<h1 id="Collection-View-的选择功能"><a href="#Collection-View-的选择功能" class="headerlink" title="Collection View 的选择功能"></a>Collection View 的选择功能</h1><p>为了显示一个 item 的被选中状态，你需要设置一个白色的边框，没有被选中的项目将不会显示这个边框。</p>
+<p>首先，你需要让我们的 Collection View 支持选中。打开 <strong>Main.storyboard</strong>，选中 <strong>Collection View</strong> 并在<strong>属性检查器</strong>里，勾选 <strong>Selectable</strong>。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-c413394c21316342.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>勾选 <strong>Selectable</strong> 开启了选择功能，意味着你可以通过点击一个 item 来选中它。如果你点击另一个 item，将会取消选择之前的那个 item 并选中新的 item。</p>
+<p>当你选中一个 item：</p>
+<ol>
+<li>它的 <code>IndexPath</code> 会被添加到 <code>NSCollectionView</code> 的 <code>selectionIndexPaths</code> 属性；</li>
+<li>它的 <code>isSelected</code> 属性会被设置为 <code>true</code>。</li>
+</ol>
+<p>打开 <strong>CollectionViewItem.swift</strong>。在 <code>viewDidLoad()</code> 方法的最后追加：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 1 </span></span><br><span class="line">view.layer?.borderColor = <span class="type">NSColor</span>.white.cgColor </span><br><span class="line"><span class="comment">// 2 </span></span><br><span class="line">view.layer?.borderWidth = <span class="number">0.0</span></span><br></pre></td></tr></table></figure>
+<p>这段代码：</p>
+<ol>
+<li>设置了一个白色的边框；</li>
+<li>把 <code>borderWidth</code> 设置为 <code>0.0</code> 来确保边框不可见 —— 也就是没被选中。</li>
+</ol>
+<p>要在每次 <code>isSelected</code> 被设置时改变 <code>borderWidth</code>，我们需要把这些代码添加到 <code>CollectionViewItem</code> 类中：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="keyword">var</span> isSelected: <span class="type">Bool</span> &#123;</span><br><span class="line">   <span class="keyword">didSet</span> &#123;</span><br><span class="line">     view.layer?.borderWidth = isSelected ? <span class="number">5.0</span> : <span class="number">0.0</span></span><br><span class="line">   &#125;</span><br><span class="line"> &#125;</span><br></pre></td></tr></table></figure>
+<p>每次 <code>isSelected</code> 发生了改变，<code>didSet</code> 将会根据新的值来设置边框的宽度。</p>
+<p>编译并运行。点击一个项目来选中它，你将会看见它周围出现了边框。哈哈哈，神奇✨！</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-f84ecab7bba30633.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<h1 id="下一步该做些啥？"><a href="#下一步该做些啥？" class="headerlink" title="下一步该做些啥？"></a>下一步该做些啥？</h1><p><a href="https://koenig-media.raywenderlich.com/uploads/2016/10/SlidesMagic8V3-Final.zip" target="_blank" rel="noopener">点击这里</a>下载最终完成了的 <strong>SlideMagic</strong>。</p>
+<p>在这个 NSCollectionView 入门教程中，你了解了如何创建你的第一个 Collection View，了解了错综复杂的数据源 API 和如何处理分区。至此你已经学到了很多，但其实这仅仅是个开始，Collection View 还有很多功能等待你去发掘。这里有很多值得去探索的东西：</p>
+<ul>
+<li>通过 Cocoa 的数据绑定构建「免数据源」的 Collection View</li>
+<li>不同类型的 Item</li>
+<li>追加和移除 Item</li>
+<li>自定义布局</li>
+<li>拖放手势（Drag and drop）</li>
+<li>动画</li>
+<li>修改 <code>NSCollectionViewFlowLayout</code></li>
+<li>收起某个分区（macOS 10.12 Sierra 的新功能）</li>
+</ul>
+<p>你可以在我们的《NSCollectionView 进阶教程》中了解更多。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-07-19T05:03:34.684Z" itemprop="dateUpdated">2019-07-19 13:03:34</time>
+</span><br>
+
+
+        
+    </div>
+    
+    <footer>
+        <a href="https://sr2k.top/blog">
+            <img src="data:image/jpeg;base64,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" alt="Siyuan Cao">
+            Siyuan Cao
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/Ray-Wenderlich/">Ray Wenderlich</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/Swift/">Swift</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/macOS/">macOS</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/翻译/">翻译</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://sr2k.top/blog/2017/09/24/译-NSCollectionView入门教程/&title=《【译】NSCollectionView 入门教程》 — SR2k&pic=https://sr2k.top/blogdata:image/jpeg;base64,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" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://sr2k.top/blog/2017/09/24/译-NSCollectionView入门教程/&title=《【译】NSCollectionView 入门教程》 — SR2k&source=Siyuan 先生の日常杂杂碎" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://sr2k.top/blog/2017/09/24/译-NSCollectionView入门教程/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《【译】NSCollectionView 入门教程》 — SR2k&url=https://sr2k.top/blog/2017/09/24/译-NSCollectionView入门教程/&via=https://sr2k.top/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://sr2k.top/blog/2017/09/24/译-NSCollectionView入门教程/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/blog/2017/09/25/译-macOS上的CoreGraphics入门教程/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">【译】macOS 上的 Core Graphics 入门教程</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/blog/2017/09/23/译-零基础macOS应用开发3/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">【译】 零基础 macOS 应用开发（三）</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/blog/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>Siyuan Cao &copy; 2015 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://sr2k.top/blog/2017/09/24/译-NSCollectionView入门教程/&title=《【译】NSCollectionView 入门教程》 — SR2k&pic=https://sr2k.top/blogdata:image/jpeg;base64,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" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://sr2k.top/blog/2017/09/24/译-NSCollectionView入门教程/&title=《【译】NSCollectionView 入门教程》 — SR2k&source=Siyuan 先生の日常杂杂碎" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://sr2k.top/blog/2017/09/24/译-NSCollectionView入门教程/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《【译】NSCollectionView 入门教程》 — SR2k&url=https://sr2k.top/blog/2017/09/24/译-NSCollectionView入门教程/&via=https://sr2k.top/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://sr2k.top/blog/2017/09/24/译-NSCollectionView入门教程/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACrElEQVR42u3a0Y4iMQwEQP7/p7nXle4Ouu0EoVXlCc3ATCorxV47j0c8nj/G39fbJ/z81bMcjxsDDw8PbzH1ZBKvr+SfX19Jnh8tAR4eHt413v921Hxar0NIezdfvjezwsPDw/syXj6hPQAPDw/vd/CSSZ8qf+Dh4eF9G+9GOpv/6nWZ40O1Fjw8PLwLXaTv+Xylv4eHh4e37qrnJYazy5cEjGi2eHh4eBd4+XSTlyXpb3K3TcrfNNjw8PDwrvHyqbdbeVsyTkoPRfKNh4eHd5Q3g7XfzENFWwh+83Y8PDy8C7x8o8+35k0RdpOgR39JPDw8vDVvVqhtywfJwm22/iju4eHh4R3itWlrvhCbSDUrEEcNMDw8PLxDvHZD35RoN6GorTbg4eHh3eDlja42Lc5JeUusTvHx8PDwLvAONJaCAsepFDwPUXh4eHif4c1Kq21oSX7Vwt7MGQ8PD+8ob9bsf47G6+fnqXlRCsHDw8O7wNu/MikN5CEkL38UT8bDw8O7wMsbYO3dPCFu22D13PDw8PCO8mbHmE5NdLZAxUEuPDw8vAu8PD1tC7izaRWFhvZMGR4eHt4h3v6Vbdkiv55fiUICHh4e3iFefpRqg9kfTciLJjUSDw8Pb8Frf9wGgFmomC0NHh4e3j3e2XJA3vJPlmB2YGtYZcHDw8MreUkzrI02SZkgT9Db4jIeHh7eZ3htrSJPuOvsfjTenCbDw8PDW/Oe5ZhVOGawNsz84y4eHh7eBV674eZLMCsutK2vYTcPDw8Pb82bBYNN4yop7ybPjIINHh4e3jVevqGfOlgwK3/UBxTw8PDwvpKXh5A2Ed+k6Xh4eHjfxpsl5fkRq/0C4eHh4d3m5ZPLv9Mm2ckStAcU8PDw8G7w2n/48+173zy7UbzAw8PDW/D+ANbjXpPRpdZlAAAAAElFTkSuQmCC" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
+
+
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>【译】macOS 上的 Core Graphics 入门教程 | SR2k</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#F37327">
+    
+    
+    <meta name="keywords" content="翻译,Ray Wenderlich,macOS,Swift">
+    <meta name="description" content="本文翻译自 raywenderlich.com 的 Core Graphics on macOS Tutorial，已咨询对方网站，可至多翻译 10 篇文章。希望各位有英语阅读能力的话，还是先打赏然后去阅读英文原吧，毕竟无论是 Xcode，抑或是官方的文档，还是各种最前沿的资讯都只有英文版本。综上，此翻译版本仅供参考，谢绝转载。 也欢迎你点击我的头像查看我翻译的其他 macOS 开发教程💋">
+<meta name="keywords" content="翻译,Ray Wenderlich,macOS,Swift">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【译】macOS 上的 Core Graphics 入门教程">
+<meta property="og:url" content="https://sr2k.top/blog/2017/09/25/译-macOS上的CoreGraphics入门教程/index.html">
+<meta property="og:site_name" content="SR2k">
+<meta property="og:description" content="本文翻译自 raywenderlich.com 的 Core Graphics on macOS Tutorial，已咨询对方网站，可至多翻译 10 篇文章。希望各位有英语阅读能力的话，还是先打赏然后去阅读英文原吧，毕竟无论是 Xcode，抑或是官方的文档，还是各种最前沿的资讯都只有英文版本。综上，此翻译版本仅供参考，谢绝转载。 也欢迎你点击我的头像查看我翻译的其他 macOS 开发教程💋">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-5204a02b7332fac7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-f0a35f95c87f254e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-6aed1359cd471275.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-8f84eb5ad169695c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-4fc358f76ed26670.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-3dd1e7d056a92c9e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-80fe225f08e1c3f4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-8316bd45e283b331.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-3a9a9a76b687046c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-e86ac3d6a8e288b0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-466bd5ddecfe519d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-ea983d52c0f02849.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-077fb51fe0aae885.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-8be0aad94ef83a2e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-11f0c635e8e2e781.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-c03336233ad3ca43.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-0d2de8a91a09b0bb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-b066eae14cf2949c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-81d4bc8182f1d863.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-a87e7ca09027a440.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-bfc8259a9457f83f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-a1d8f29e9ccf8ff1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-53339621371d124f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-bf60da1d58848b16.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-e246d4795e5dec1b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-bda1ff3ab8d8e064.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-5169614dde1ef08a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-27ddddbb77a21564.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/5477931-2b67c2e23ffc4526.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2019-07-19T05:03:34.684Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【译】macOS 上的 Core Graphics 入门教程">
+<meta name="twitter:description" content="本文翻译自 raywenderlich.com 的 Core Graphics on macOS Tutorial，已咨询对方网站，可至多翻译 10 篇文章。希望各位有英语阅读能力的话，还是先打赏然后去阅读英文原吧，毕竟无论是 Xcode，抑或是官方的文档，还是各种最前沿的资讯都只有英文版本。综上，此翻译版本仅供参考，谢绝转载。 也欢迎你点击我的头像查看我翻译的其他 macOS 开发教程💋">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/5477931-5204a02b7332fac7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+    
+        <link rel="alternate" type="application/atom+xml" title="SR2k" href="/blog/atom.xml">
+    
+    <link rel="shortcut icon" href="/blog/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="data:image/jpeg;base64,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">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Siyuan Cao</h5>
+          <a href="mailto:seeran@outlook.com" title="seeran@outlook.com" class="mail">seeran@outlook.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                存档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/SR2k" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://weibo.com/234970213" target="_blank" >
+                <i class="icon icon-lg icon-weibo"></i>
+                Weibo
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://sr2k.top"  >
+                <i class="icon icon-lg icon-male"></i>
+                简历
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">【译】macOS 上的 Core Graphics 入门教程</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">【译】macOS 上的 Core Graphics 入门教程</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2017-09-25T09:54:11.000Z" itemprop="datePublished" class="page-time">
+  2017-09-25
+</time>
+
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#准备开始"><span class="post-toc-number">1.</span> <span class="post-toc-text">准备开始</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#创建一个自定义视图"><span class="post-toc-number">2.</span> <span class="post-toc-text">创建一个自定义视图</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#创建-NSView-的子类"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">创建 NSView 的子类</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#重写-draw"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">重写 draw(_:)</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#实时渲染预览：-IBDesignable-和-IBInspectable"><span class="post-toc-number">3.</span> <span class="post-toc-text">实时渲染预览：@IBDesignable 和 @IBInspectable</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Graphics-Context（图形上下文）"><span class="post-toc-number">4.</span> <span class="post-toc-text">Graphics Context（图形上下文）</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#绘制路径"><span class="post-toc-number">5.</span> <span class="post-toc-text">绘制路径</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#为饼图…绘制一个路径"><span class="post-toc-number">5.1.</span> <span class="post-toc-text">为饼图…绘制一个路径</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#计算位置"><span class="post-toc-number">5.2.</span> <span class="post-toc-text">计算位置</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#剪切一部分区域（也就是蒙版）"><span class="post-toc-number">6.</span> <span class="post-toc-text">剪切一部分区域（也就是蒙版）</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#绘制文本"><span class="post-toc-number">6.1.</span> <span class="post-toc-text">绘制文本</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Cocoa-Drawing"><span class="post-toc-number">7.</span> <span class="post-toc-text">Cocoa Drawing</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#绘制渐变"><span class="post-toc-number">7.1.</span> <span class="post-toc-text">绘制渐变</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#练习-挑战：绘制饼图的图例"><span class="post-toc-number">8.</span> <span class="post-toc-text">练习/挑战：绘制饼图的图例</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#答案：绘制图例"><span class="post-toc-number">9.</span> <span class="post-toc-text">答案：绘制图例</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#接下来该做啥？"><span class="post-toc-number">10.</span> <span class="post-toc-text">接下来该做啥？</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-译-macOS上的CoreGraphics入门教程"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">【译】macOS 上的 Core Graphics 入门教程</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2017-09-25 17:54:11" datetime="2017-09-25T09:54:11.000Z"  itemprop="datePublished">2017-09-25</time>
+
+            
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <blockquote>
+<p>本文翻译自 <a href="https://www.raywenderlich.com/" target="_blank" rel="noopener">raywenderlich.com</a> 的 <a href="https://www.raywenderlich.com/128614/core-graphics-os-x-tutorial" target="_blank" rel="noopener">Core Graphics on macOS Tutorial</a>，已咨询对方网站，可至多翻译 10 篇文章。<br>希望各位有英语阅读能力的话，还是<strong>先打赏</strong>然后去阅读英文原吧，毕竟无论是 Xcode，抑或是官方的文档，还是各种最前沿的资讯都只有英文版本。<br>综上，此翻译版本仅供参考，<strong>谢绝转载</strong>。</p>
+<p>也欢迎你点击我的头像查看我翻译的其他 macOS 开发教程💋</p>
+</blockquote>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-5204a02b7332fac7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<blockquote>
+<p><strong>更新于 2016-9-22：</strong>此教程已更新至 Xcode 8 和 Swift 3。</p>
+</blockquote>
+<p>你肯定见过许多拥有漂亮的界面和华丽的自定义视图的 app，它们肯定在你的心里留下了深刻的印象，因为它们是<strong>那！么！好！看！</strong></p>
+<p><strong>Core Graphics</strong> 是 Apple 提供的 2D 绘图引擎，也几乎是 macOS 和 iOS 所有框架中最酷的了。它可以用来绘制你能想到的所有图形，从简单的几何形状到复杂的阴影和渐变等视觉效果。</p>
+<p>在这个 macOS Core Graphics 教程中，你将会创造一个叫做 <strong>DiskInfo</strong> 的自定义视图，它能用一张饼图和一个条状图来显示出你 Mac 上的硬盘可用空间。这个教程将会让你拥有把平淡单调的 UI 变得精彩纷呈的能力：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-f0a35f95c87f254e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>在这个教程中你将学会：</p>
+<ul>
+<li>创建并配置一个自定义视图，这是绘制图形元素的必要条件；</li>
+<li>实现实时渲染预览功能，有了它你不需要编译和运行，就能在 Interface Builder 里看到你对图形的各种修改；</li>
+<li>用代码绘制路径、填充图形、创建剪切蒙版剪辑和渲染文本；</li>
+<li>使用 <strong>AppKit</strong> 里的 <strong>Cocoa Drawing</strong> 工具提供的高级类和方法。</li>
+</ul>
+<p>在第一部分中，你将会通过 Core Graphics 来实现绘制一个饼图，稍后你将会学习如何用 Cocoa Drawing 实现相同的效果。</p>
+<p>所以拿起你的小画刷，我们要开始作画啦～</p>
+<h1 id="准备开始"><a href="#准备开始" class="headerlink" title="准备开始"></a>准备开始</h1><p><a href="https://koenig-media.raywenderlich.com/uploads/2016/06/DiskInfo-Starter.zip" target="_blank" rel="noopener">点击这里</a>下载 DiskInfo 的起步工程，编译并运行它：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-6aed1359cd471275.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>这个 app 会罗列出你的所有硬盘，点击任何一个即可查看他的详细信息。</p>
+<p>在操作之前，我们先来熟悉一下这个项目的结构：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-8f84eb5ad169695c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<ul>
+<li><strong>ViewController.swift</strong>：app 的主要 View Controller；</li>
+<li><strong>VolumeInfo.swift</strong>：实现了用于处理硬盘信息的 <code>VolumeInfo</code> 类，以及用于分析不同文件类型所占空间的 <code>FilesDistribution</code> 结构体；</li>
+<li><strong>NSColor+DiskInfo.swift</strong> 和 <strong>NSFont+DiskInfo.swift</strong>：扩展了 NSColor，定义了 app 中会用到的颜色和字体；</li>
+<li><strong>CGFloat+Radians.swift</strong>：扩展了 CGFloat，提供了转换角度值和弧度制的 helper 方法；</li>
+<li><strong>MountedVolumesDataSource.swift</strong> 和 <strong>MountedVolumesDelegate.swift</strong>：实现了显示硬盘信息所必需的各类方法。</li>
+</ul>
+<blockquote>
+<p><strong>注意：</strong>这个 app 可以显示你真正的硬盘用量信息，但在这个教程中，它将会生成随机的数据。<br>每次启动 app 时都计算一次硬盘上所有文件的类型会很耗时，也会消磨完你所有的乐趣，没人愿意在这上面浪费时间，对吧😉？</p>
+</blockquote>
+<h1 id="创建一个自定义视图"><a href="#创建一个自定义视图" class="headerlink" title="创建一个自定义视图"></a>创建一个自定义视图</h1><p>你要做的第一件事是创建一个名叫 <code>GraphView</code> 的自定义视图。这将会是你绘制饼状图和条形图的地方。这个部分中你需要做两件事：</p>
+<ol>
+<li>创建一个 <code>NSView</code> 的子类；</li>
+<li>重写 <code>draw(_:)</code> 方法，加入一些用于绘制的代码。</li>
+</ol>
+<h2 id="创建-NSView-的子类"><a href="#创建-NSView-的子类" class="headerlink" title="创建 NSView 的子类"></a>创建 NSView 的子类</h2><p>选中项目导航器的 <strong>Views</strong> 分组，点击去 Xcode 菜单上的 <strong>File</strong> → <strong>New</strong> → <strong>File…</strong>，然后点击 <strong>macOS</strong> → <strong>Source</strong> → <strong>Cocoa Class</strong> 模版。</p>
+<p>点击 <strong>Next</strong>，把新的类命名为 <code>GraphView</code>，并让它继承自 <code>NSView</code>，把语言选择为 <strong>Swift</strong>。</p>
+<p>点击 <strong>Next</strong> 和 <strong>Create</strong> 来保存你的文件。</p>
+<p>打开 <strong>Main.storyboard</strong>，在 <strong>View Controller Scene</strong> 中，从<strong>控件库</strong>里拖入一个 <strong>Custom View</strong>。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-4fc358f76ed26670.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>选中这个 Custom View，在<strong>身份检查器</strong>里，把它的类名设置为 <code>GraphView</code>。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-3dd1e7d056a92c9e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>你需要一些约束，所以保持 Graph View 的选中状态，点击 Auto Layout 工具栏上的 <strong>Pin</strong> 按钮，把它的 <strong>Top</strong>、<strong>Bottom</strong>、<strong>Leading</strong> 和 <strong>Trailing</strong> 约束设置为 0，然后点击 <strong>Add 4 Constrains</strong> 按钮。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-80fe225f08e1c3f4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>点击 Auto Layout 工具栏上的三角形的 <strong>Resolve Auto Layout Issues</strong> 按钮，然后在 <strong>Selected Views</strong> 部分中点击 <strong>Update Frames</strong>。如果这个选项不可用，你可能需要先点击空白处取消选中 Graph View，然后再次选中它。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-8316bd45e283b331.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<h2 id="重写-draw"><a href="#重写-draw" class="headerlink" title="重写 draw(_:)"></a>重写 <code>draw(_:)</code></h2><p>打开 <strong>GraphView.swift</strong>，你能看到 Xcode 自动为我们创建了一个 <code>draw(_:)</code> 的实现。把那行注释替换成以下代码，并确保你别不小心删掉了它调用父类此方法的那一行哦。</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">NSColor</span>.white.setFill() </span><br><span class="line"><span class="type">NSRectFill</span>(bounds)</span><br></pre></td></tr></table></figure>
+<p>第一行代码把填充颜色设置为了白色，然后通过调用 <code>NSRectFill</code> 方法，你把整个视图的背景设成了白色。</p>
+<p>编译并运行：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-3a9a9a76b687046c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>你已经把自定义视图的背景从默认的灰色改成了白色。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-e86ac3d6a8e288b0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>哈哈，我们的画布已经就绪！就是这么简单～</p>
+<h1 id="实时渲染预览：-IBDesignable-和-IBInspectable"><a href="#实时渲染预览：-IBDesignable-和-IBInspectable" class="headerlink" title="实时渲染预览：@IBDesignable 和 @IBInspectable"></a>实时渲染预览：<code>@IBDesignable</code> 和 <code>@IBInspectable</code></h1><p>Xcode 6 为我们带来了一个牛×的功能：实时渲染预览。它允许你在 Interface Builder 里查看你自定义的视图的样子，而不用每次都编译和运行。</p>
+<p>要启用这个功能，你需要用 <code>@IBDesignable</code> 来修饰你的类；并实现 <code>prepareForInterfaceBuilder()</code> 方法来提供一些示例数据（实现这个方法不是必须的）。</p>
+<p>打开 <strong>GraphView.swift</strong>，在类的定义之前加入：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@IBDesignable</span></span><br></pre></td></tr></table></figure>
+<p>现在你需要提供一些示例数据，把这些代码添加到 <code>GraphView</code> 类中：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> fileDistribution: <span class="type">FilesDistribution?</span> &#123;</span><br><span class="line">  <span class="keyword">didSet</span> &#123;</span><br><span class="line">    needsDisplay = <span class="literal">true</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">func</span> <span class="title">prepareForInterfaceBuilder</span><span class="params">()</span></span> &#123;</span><br><span class="line">  <span class="keyword">let</span> used = <span class="type">Int64</span>(<span class="number">100000000000</span>)</span><br><span class="line">  <span class="keyword">let</span> available = used / <span class="number">3</span></span><br><span class="line">  <span class="keyword">let</span> filesBytes = used / <span class="number">5</span></span><br><span class="line">  <span class="keyword">let</span> distribution: [<span class="type">FileType</span>] = [</span><br><span class="line">    .apps(bytes: filesBytes / <span class="number">2</span>, percent: <span class="number">0.1</span>),</span><br><span class="line">    .photos(bytes: filesBytes, percent: <span class="number">0.2</span>),</span><br><span class="line">    .movies(bytes: filesBytes * <span class="number">2</span>, percent: <span class="number">0.15</span>),</span><br><span class="line">    .audio(bytes: filesBytes, percent: <span class="number">0.18</span>),</span><br><span class="line">    .other(bytes: filesBytes, percent: <span class="number">0.2</span>)</span><br><span class="line">  ]</span><br><span class="line">  fileDistribution = <span class="type">FilesDistribution</span>(capacity: used + available,</span><br><span class="line">                                       available: available,</span><br><span class="line">                                       distribution: distribution)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这将会定义一个 <code>fileDistribution</code> 属性用于存储硬盘的信息。当这个属性发生改变，它会设置这个视图的 <code>needsDisplay</code> 属性为 <code>true</code>，从而让视图重绘自己的内容。</p>
+<p>然后，它实现了  <code>prepareForInterfaceBuilder()</code> 方法，以此创建了一个各种文件类型的例子，用于给 Xcode 预览这个视图。</p>
+<blockquote>
+<p><strong>注意：</strong>你甚至可以在 Interface Builder 里实时修改视觉属性。这要求你用 <code>@IBInspectable</code> 来修饰这个属性。</p>
+</blockquote>
+<p>下一步：用 <code>@IBInspectable</code> 修饰所有的视觉属性，把这些代码添加到 <code>GraphView</code> 的声明中：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 1</span></span><br><span class="line"><span class="keyword">fileprivate</span> <span class="class"><span class="keyword">struct</span> <span class="title">Constants</span> </span>&#123;</span><br><span class="line">  <span class="keyword">static</span> <span class="keyword">let</span> barHeight: <span class="type">CGFloat</span> = <span class="number">30.0</span></span><br><span class="line">  <span class="keyword">static</span> <span class="keyword">let</span> barMinHeight: <span class="type">CGFloat</span> = <span class="number">20.0</span></span><br><span class="line">  <span class="keyword">static</span> <span class="keyword">let</span> barMaxHeight: <span class="type">CGFloat</span> = <span class="number">40.0</span></span><br><span class="line">  <span class="keyword">static</span> <span class="keyword">let</span> marginSize: <span class="type">CGFloat</span> = <span class="number">20.0</span></span><br><span class="line">  <span class="keyword">static</span> <span class="keyword">let</span> pieChartWidthPercentage: <span class="type">CGFloat</span> = <span class="number">1.0</span> / <span class="number">3.0</span></span><br><span class="line">  <span class="keyword">static</span> <span class="keyword">let</span> pieChartBorderWidth: <span class="type">CGFloat</span> = <span class="number">1.0</span></span><br><span class="line">  <span class="keyword">static</span> <span class="keyword">let</span> pieChartMinRadius: <span class="type">CGFloat</span> = <span class="number">30.0</span></span><br><span class="line">  <span class="keyword">static</span> <span class="keyword">let</span> pieChartGradientAngle: <span class="type">CGFloat</span> = <span class="number">90.0</span></span><br><span class="line">  <span class="keyword">static</span> <span class="keyword">let</span> barChartCornerRadius: <span class="type">CGFloat</span> = <span class="number">4.0</span></span><br><span class="line">  <span class="keyword">static</span> <span class="keyword">let</span> barChartLegendSquareSize: <span class="type">CGFloat</span> = <span class="number">8.0</span></span><br><span class="line">  <span class="keyword">static</span> <span class="keyword">let</span> legendTextMargin: <span class="type">CGFloat</span> = <span class="number">5.0</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 2</span></span><br><span class="line"><span class="meta">@IBInspectable</span> <span class="keyword">var</span> barHeight: <span class="type">CGFloat</span> = <span class="type">Constants</span>.barHeight &#123;</span><br><span class="line">  <span class="keyword">didSet</span> &#123;</span><br><span class="line">    barHeight = <span class="built_in">max</span>(<span class="built_in">min</span>(barHeight, <span class="type">Constants</span>.barMaxHeight), <span class="type">Constants</span>.barMinHeight)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">@IBInspectable</span> <span class="keyword">var</span> pieChartUsedLineColor: <span class="type">NSColor</span> = <span class="type">NSColor</span>.pieChartUsedStrokeColor</span><br><span class="line"><span class="meta">@IBInspectable</span> <span class="keyword">var</span> pieChartAvailableLineColor: <span class="type">NSColor</span> = <span class="type">NSColor</span>.pieChartAvailableStrokeColor</span><br><span class="line"><span class="meta">@IBInspectable</span> <span class="keyword">var</span> pieChartAvailableFillColor: <span class="type">NSColor</span> = <span class="type">NSColor</span>.pieChartAvailableFillColor</span><br><span class="line"><span class="meta">@IBInspectable</span> <span class="keyword">var</span> pieChartGradientStartColor: <span class="type">NSColor</span> = <span class="type">NSColor</span>.pieChartGradientStartColor</span><br><span class="line"><span class="meta">@IBInspectable</span> <span class="keyword">var</span> pieChartGradientEndColor: <span class="type">NSColor</span> = <span class="type">NSColor</span>.pieChartGradientEndColor</span><br><span class="line"><span class="meta">@IBInspectable</span> <span class="keyword">var</span> barChartAvailableLineColor: <span class="type">NSColor</span> = <span class="type">NSColor</span>.availableStrokeColor</span><br><span class="line"><span class="meta">@IBInspectable</span> <span class="keyword">var</span> barChartAvailableFillColor: <span class="type">NSColor</span> = <span class="type">NSColor</span>.availableFillColor</span><br><span class="line"><span class="meta">@IBInspectable</span> <span class="keyword">var</span> barChartAppsLineColor: <span class="type">NSColor</span> = <span class="type">NSColor</span>.appsStrokeColor</span><br><span class="line"><span class="meta">@IBInspectable</span> <span class="keyword">var</span> barChartAppsFillColor: <span class="type">NSColor</span> = <span class="type">NSColor</span>.appsFillColor</span><br><span class="line"><span class="meta">@IBInspectable</span> <span class="keyword">var</span> barChartMoviesLineColor: <span class="type">NSColor</span> = <span class="type">NSColor</span>.moviesStrokeColor</span><br><span class="line"><span class="meta">@IBInspectable</span> <span class="keyword">var</span> barChartMoviesFillColor: <span class="type">NSColor</span> = <span class="type">NSColor</span>.moviesFillColor</span><br><span class="line"><span class="meta">@IBInspectable</span> <span class="keyword">var</span> barChartPhotosLineColor: <span class="type">NSColor</span> = <span class="type">NSColor</span>.photosStrokeColor</span><br><span class="line"><span class="meta">@IBInspectable</span> <span class="keyword">var</span> barChartPhotosFillColor: <span class="type">NSColor</span> = <span class="type">NSColor</span>.photosFillColor</span><br><span class="line"><span class="meta">@IBInspectable</span> <span class="keyword">var</span> barChartAudioLineColor: <span class="type">NSColor</span> = <span class="type">NSColor</span>.audioStrokeColor</span><br><span class="line"><span class="meta">@IBInspectable</span> <span class="keyword">var</span> barChartAudioFillColor: <span class="type">NSColor</span> = <span class="type">NSColor</span>.audioFillColor</span><br><span class="line"><span class="meta">@IBInspectable</span> <span class="keyword">var</span> barChartOthersLineColor: <span class="type">NSColor</span> = <span class="type">NSColor</span>.othersStrokeColor</span><br><span class="line"><span class="meta">@IBInspectable</span> <span class="keyword">var</span> barChartOthersFillColor: <span class="type">NSColor</span> = <span class="type">NSColor</span>.othersFillColor</span><br><span class="line"></span><br><span class="line"><span class="comment">// 3</span></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">colorsForFileType</span><span class="params">(fileType: FileType)</span></span> -&gt; (strokeColor: <span class="type">NSColor</span>, fillColor: <span class="type">NSColor</span>) &#123;</span><br><span class="line">  <span class="keyword">switch</span> fileType &#123;</span><br><span class="line">  <span class="keyword">case</span> .audio(<span class="number">_</span>, <span class="number">_</span>):</span><br><span class="line">    <span class="keyword">return</span> (strokeColor: barChartAudioLineColor, fillColor: barChartAudioFillColor)</span><br><span class="line">  <span class="keyword">case</span> .movies(<span class="number">_</span>, <span class="number">_</span>):</span><br><span class="line">    <span class="keyword">return</span> (strokeColor: barChartMoviesLineColor, fillColor: barChartMoviesFillColor)</span><br><span class="line">  <span class="keyword">case</span> .photos(<span class="number">_</span>, <span class="number">_</span>):</span><br><span class="line">    <span class="keyword">return</span> (strokeColor: barChartPhotosLineColor, fillColor: barChartPhotosFillColor)</span><br><span class="line">  <span class="keyword">case</span> .apps(<span class="number">_</span>, <span class="number">_</span>):</span><br><span class="line">    <span class="keyword">return</span> (strokeColor: barChartAppsLineColor, fillColor: barChartAppsFillColor)</span><br><span class="line">  <span class="keyword">case</span> .other(<span class="number">_</span>, <span class="number">_</span>):</span><br><span class="line">    <span class="keyword">return</span> (strokeColor: barChartOthersLineColor, fillColor: barChartOthersFillColor)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这一大坨代码的作用是：</p>
+<ol>
+<li>声明了带有许多常量的结构体 —— 你得在这个 app 的各个地方用到它们；</li>
+<li>用 <code>@IBInspectable</code> 修饰所有可配置的属性。并使用 <strong>NSColor+DiskInfo.swift</strong> 中的值为它们赋值。注意：要使一个属性「inspectable」（可以在 Interface Builder 里直接编辑），你必须声明它的类型，即使大多数情况下 Swift 会帮你做这件事儿；</li>
+<li>定义一个 Helper 方法，为不同的文件类型返回它的笔触颜色和填充颜色。你在绘制「什么文件占了多大地儿」的图表的时候会用到它。</li>
+</ol>
+<p>打开 <strong>Main.stroyboard</strong>，你应该能注意到 Graph View 已经从默认的灰色变成了白色，这意味着实时渲染预览已经起作用了。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-466bd5ddecfe519d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>选中 Graph View，打开<strong>属性检查器</strong>，你会发现所有的「inspectable」属性已经出现在这里了。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-ea983d52c0f02849.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>现在开始，要查看调整好的效果，你可以直接编译和运行，也可以直接在 Interface Builder 里查看。</p>
+<p>万事俱备，是时候开始真正的绘制啦！</p>
+<h1 id="Graphics-Context（图形上下文）"><a href="#Graphics-Context（图形上下文）" class="headerlink" title="Graphics Context（图形上下文）"></a>Graphics Context（图形上下文）</h1><p>在使用 Core Graphics 的时候，你并不是直接在视图中绘画，而是使用一个叫 <strong>Graphics Context（图形上下文）</strong>的东西，它是系统渲染图形与把图形显示在视图中的中间层。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-077fb51fe0aae885.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>Core Graphics 使用一个叫「Painter’s Model（画家模式）」的模式，你可以想像成自己拿着笔，唰唰地在画布上绘图样子。你需要放置一个路径，然后去填充它，你没办法去改变已经布置好的像素们，但你可以在它们之上继续画图。</p>
+<p>这个「上下文」非常重要，因为他决定了你最终得到的效果。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-8be0aad94ef83a2e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<h1 id="绘制路径"><a href="#绘制路径" class="headerlink" title="绘制路径"></a>绘制路径</h1><p>要使用 Core Graphics 绘制一个路径，你需要定义一个 <strong>Path（路径）</strong>，也就是 <code>CGPathRef</code> 和可变的 <code>CGMutablePathRef</code>。</p>
+<p>路径准备好以后，把它添加到图形上下文里，就可以根据路径和绘制属性渲染出你要的图形了。</p>
+<h2 id="为饼图…绘制一个路径"><a href="#为饼图…绘制一个路径" class="headerlink" title="为饼图…绘制一个路径"></a>为饼图…绘制一个路径</h2><p>条形图的基本元素是圆角矩形，所以我们从这里开始入手。</p>
+<p>打开 <strong>GraphView.swift</strong>，把这个扩展添加在文件底部类定义以外的地方：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// MARK: - 用于绘制的 extension</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">extension</span> <span class="title">GraphView</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">func</span> <span class="title">drawRoundedRect</span><span class="params">(rect: CGRect, inContext context: CGContext?,</span></span></span><br><span class="line"><span class="function"><span class="params">                       radius: CGFloat, borderColor: CGColor, fillColor: CGColor)</span></span> &#123;</span><br><span class="line">    <span class="comment">// 1</span></span><br><span class="line">    <span class="keyword">let</span> path = <span class="type">CGMutablePath</span>()</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 2</span></span><br><span class="line">    path.move( to: <span class="type">CGPoint</span>(x:  rect.midX, y:rect.minY ))</span><br><span class="line">    path.addArc( tangent1End: <span class="type">CGPoint</span>(x: rect.maxX, y: rect.minY ), </span><br><span class="line">                 tangent2End: <span class="type">CGPoint</span>(x: rect.maxX, y: rect.maxY), radius: radius)</span><br><span class="line">    path.addArc( tangent1End: <span class="type">CGPoint</span>(x: rect.maxX, y: rect.maxY ), </span><br><span class="line">                 tangent2End: <span class="type">CGPoint</span>(x: rect.minX, y: rect.maxY), radius: radius)</span><br><span class="line">    path.addArc( tangent1End: <span class="type">CGPoint</span>(x: rect.minX, y: rect.maxY ), </span><br><span class="line">                 tangent2End: <span class="type">CGPoint</span>(x: rect.minX, y: rect.minY), radius: radius)</span><br><span class="line">    path.addArc( tangent1End: <span class="type">CGPoint</span>(x: rect.minX, y: rect.minY ), </span><br><span class="line">                 tangent2End: <span class="type">CGPoint</span>(x: rect.maxX, y: rect.minY), radius: radius)</span><br><span class="line">    path.closeSubpath()</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 3</span></span><br><span class="line">    context?.setLineWidth(<span class="number">1.0</span>)</span><br><span class="line">    context?.setFillColor(fillColor)</span><br><span class="line">    context?.setStrokeColor(borderColor)</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 4</span></span><br><span class="line">    context?.addPath(path)</span><br><span class="line">    context?.drawPath(using: .fillStroke)</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>太长不看🙄️：以上<strong>就</strong>是绘制一个圆角矩形的方法，用人类能理解的语言解释一遍就是：</p>
+<ol>
+<li>创建一个可以改变的路径；</li>
+<li>一步一步勾勒出一个圆角矩形：<ul>
+<li>移动到矩形底边的中点，这里将是我们的起点；</li>
+<li>使用 <code>addArc(tangent1End:tangent2End:radius)</code> 方法绘制右下角的线段，这个方法会绘制出底部的水平线以及右下角的圆角；</li>
+<li>添加右边的线段和右上角的圆角；</li>
+<li>添加顶部的线段和左上角的圆角；</li>
+<li>添加左边的线段和左下角的圆角；</li>
+<li>闭合路径，也就是从上一步的重点连接到起点；</li>
+</ul>
+</li>
+<li>设置绘制属性：线宽、填充颜色和边框颜色；</li>
+<li>把路径添加到图形上下文，并使用 <code>.fillStroke</code> 参数绘制着个路径，这个参数将会告诉 Core Graphics 这条路径需要填充颜色并绘制边框。</li>
+</ol>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-11f0c635e8e2e781.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<h2 id="计算位置"><a href="#计算位置" class="headerlink" title="计算位置"></a>计算位置</h2><p>使用 Core Graphics 进行绘制的过程其实就是计算各个视觉元素在视图中位置的过程。所以我们需要关心的就是把不同的元素放置在哪，以及当视图的大小发生变化时它们该如何应对。</p>
+<p>我们准备这样布局我们的视图：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-c03336233ad3ca43.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>打开 <strong>GraphView.swift</strong> 并添加这个扩展：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// MARK: - 用于计算的 extension</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">extension</span> <span class="title">GraphView</span> </span>&#123;</span><br><span class="line">  <span class="comment">// 1</span></span><br><span class="line">  <span class="function"><span class="keyword">func</span> <span class="title">pieChartRectangle</span><span class="params">()</span></span> -&gt; <span class="type">CGRect</span> &#123;</span><br><span class="line">    <span class="keyword">let</span> width = bounds.size.width * <span class="type">Constants</span>.pieChartWidthPercentage - <span class="number">2</span> * <span class="type">Constants</span>.marginSize</span><br><span class="line">    <span class="keyword">let</span> height = bounds.size.height - <span class="number">2</span> * <span class="type">Constants</span>.marginSize</span><br><span class="line">    <span class="keyword">let</span> diameter = <span class="built_in">max</span>(<span class="built_in">min</span>(width, height), <span class="type">Constants</span>.pieChartMinRadius)</span><br><span class="line">    <span class="keyword">let</span> rect = <span class="type">CGRect</span>(x: <span class="type">Constants</span>.marginSize,</span><br><span class="line">                      y: bounds.midY - diameter / <span class="number">2.0</span>,</span><br><span class="line">                      width: diameter, height: diameter)</span><br><span class="line">    <span class="keyword">return</span> rect</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 2</span></span><br><span class="line">  <span class="function"><span class="keyword">func</span> <span class="title">barChartRectangle</span><span class="params">()</span></span> -&gt; <span class="type">CGRect</span> &#123;</span><br><span class="line">    <span class="keyword">let</span> pieChartRect = pieChartRectangle()</span><br><span class="line">    <span class="keyword">let</span> width = bounds.size.width - pieChartRect.maxX - <span class="number">2</span> * <span class="type">Constants</span>.marginSize</span><br><span class="line">    <span class="keyword">let</span> rect = <span class="type">CGRect</span>(x: pieChartRect.maxX + <span class="type">Constants</span>.marginSize,</span><br><span class="line">                      y: pieChartRect.midY + <span class="type">Constants</span>.marginSize,</span><br><span class="line">                      width: width, height: barHeight)</span><br><span class="line">    <span class="keyword">return</span> rect</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 3</span></span><br><span class="line">  <span class="function"><span class="keyword">func</span> <span class="title">barChartLegendRectangle</span><span class="params">()</span></span> -&gt; <span class="type">CGRect</span> &#123;</span><br><span class="line">    <span class="keyword">let</span> barchartRect = barChartRectangle()</span><br><span class="line">    <span class="keyword">let</span> rect = barchartRect.offsetBy(dx: <span class="number">0.0</span>, dy: -(barchartRect.size.height + <span class="type">Constants</span>.marginSize))</span><br><span class="line">    <span class="keyword">return</span> rect</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>以上代码做了这些必要的计算：</p>
+<ol>
+<li>从计算饼图的位置开始入手，它将会垂直居中，并占据视图 1/3 的宽度；</li>
+<li>计算条形图的位置，它将会占据 2/3 的宽度，并处于视图中部偏上的位置；</li>
+<li>根据饼图的最小 Y 值和边距来计算图例的位置。</li>
+</ol>
+<p>现在我们来把把它绘制到你的视图中去，在 <code>GraphView</code> 的用于绘制的扩展中加入：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">drawBarGraphInContext</span><span class="params">(context: CGContext?)</span></span> &#123;</span><br><span class="line">  <span class="keyword">let</span> barChartRect = barChartRectangle()</span><br><span class="line">  drawRoundedRect(rect: barChartRect, inContext: context,</span><br><span class="line">                  radius: <span class="type">Constants</span>.barChartCornerRadius,</span><br><span class="line">                  borderColor: barChartAvailableLineColor.cgColor,</span><br><span class="line">                  fillColor: barChartAvailableFillColor.cgColor)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>你需要一个 Helper 方法来绘制条形图，它会绘制一个圆角矩形，并使用画笔颜色和填充颜色在空白处绘制图形，你可以在 <strong>NSColor+DiskInfo</strong> 扩展中找到这个些颜色。</p>
+<p>把 <code>draw(_:)</code> 方法里的所有代码替换成：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">super</span>.draw(dirtyRect)</span><br><span class="line">      </span><br><span class="line"><span class="keyword">let</span> context = <span class="type">NSGraphicsContext</span>.current()?.cgContext</span><br><span class="line">drawBarGraphInContext(context: context)</span><br></pre></td></tr></table></figure>
+<p>这段代码会真正地把图形绘制到视图中去。首先，通过调用 <code>NSGraphicsContext.current()</code>，我们获取到了当前视图的图形上下文，然后我们调用刚刚编写的方法绘制出了条形图。</p>
+<p>编译并运行，你可以看到条形图已经就位了：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-0d2de8a91a09b0bb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>现在，打开 <strong>Main.storyboard</strong> 并选中 <strong>View Controller Scene</strong>， 你会看到这个：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-b066eae14cf2949c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>Interface Builder 为你实时渲染了预览。你可以试着去修改一下颜色，它也会实时响应你的修改，是不是很棒棒呀😄～</p>
+<h1 id="剪切一部分区域（也就是蒙版）"><a href="#剪切一部分区域（也就是蒙版）" class="headerlink" title="剪切一部分区域（也就是蒙版）"></a>剪切一部分区域（也就是蒙版）</h1><p>现在我们来制作文件分布图，也就是这个家伙：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-81d4bc8182f1d863.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>先暂停一下下，我们来理理思路。显而易见的是，每种文件都有自己的专属颜色，我们的 app 只需要根据这种文件占硬盘空间大小的百分比来计算每个方块的宽度，然后用对应的颜色把它绘制出来。</p>
+<p>你需要绘制一个不规则的图形，比如一个!@#¥%%。然而，我们可以通过一个叫 <strong>clipping areas（蒙板）</strong> 的技术来避免编写重复代码。</p>
+<blockquote>
+<p>👆这一段的第一句实在没看懂，求指正：You could create a special shape, such as a filled rectangle with two lines at bottom and top of the rectangle。</p>
+</blockquote>
+<p>你可以把蒙版想象成「在一张纸上剪了个窟窿」，你只能透过这个窟窿看到部分的图形。这个「窟窿」就叫做「Clipping Mask（剪切蒙版）」，你需要在 Core Graphics 里定义它。</p>
+<p>在这个条形图的例子里，你需要为每种文件分类创建一个完整的圆角矩形，然后通过剪切蒙版来使它们只显示正确的部分：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-a87e7ca09027a440.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>理论说完了，我们来动手吧～</p>
+<p>开支绘制之前，你需要为选中的硬盘设置 <code>fileDistribution</code>。打开 <strong>Main.storyboard</strong>，我们来创建一个 Outlet 连接。</p>
+<p>在项目导航器里按住 <strong>Option⌥ 键</strong>的同时点击 <strong>ViewController.swift</strong>，使它显示在右半边的<strong>协助编辑器</strong>里，然后按住 <strong>Control⌃ 键</strong>的同时把 Graph View 拖动到 View Controller 的代码里。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-bfc8259a9457f83f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>在弹出的小气泡里，把这个 Outlet 命名为 <code>graphView</code>，并点击 <strong>Connect</strong>。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-a1d8f29e9ccf8ff1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>打开 <strong>ViewController.swift</strong> 并把这行代码添加到 <code>showVolumeInfo(_:)</code> 的末尾：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">graphView.fileDistribution = volume.fileDistribution</span><br></pre></td></tr></table></figure>
+<p>这行代码设置了 <code>fileDistribution</code> 的值，从而让 Graph View 能获取各类文件占的百分比。</p>
+<p>打开 <strong>GraphView.swift</strong>，把这些代码添加到 <code>drawBarGraphInContext(context:)</code> 的末尾来绘制条形图：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 1</span></span><br><span class="line"><span class="keyword">if</span> <span class="keyword">let</span> fileTypes = fileDistribution?.distribution, <span class="keyword">let</span> capacity = fileDistribution?.capacity, capacity &gt; <span class="number">0</span> &#123;</span><br><span class="line">  <span class="keyword">var</span> clipRect = barChartRect</span><br><span class="line">  <span class="comment">// 2</span></span><br><span class="line">  <span class="keyword">for</span> (index, fileType) <span class="keyword">in</span> fileTypes.enumerated() &#123;</span><br><span class="line">    <span class="comment">// 3</span></span><br><span class="line">    <span class="keyword">let</span> fileTypeInfo = fileType.fileTypeInfo</span><br><span class="line">    <span class="keyword">let</span> clipWidth = floor(barChartRect.width * <span class="type">CGFloat</span>(fileTypeInfo.percent))</span><br><span class="line">    clipRect.size.width = clipWidth</span><br><span class="line">        </span><br><span class="line">    <span class="comment">// 4</span></span><br><span class="line">    context?.saveGState()</span><br><span class="line">    context?.clip(to: clipRect)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">let</span> fileTypeColors = colorsForFileType(fileType: fileType)</span><br><span class="line">    drawRoundedRect(rect: barChartRect, inContext: context,</span><br><span class="line">                    radius: <span class="type">Constants</span>.barChartCornerRadius,</span><br><span class="line">                    borderColor: fileTypeColors.strokeColor.cgColor,</span><br><span class="line">                    fillColor: fileTypeColors.fillColor.cgColor)</span><br><span class="line">    context?.restoreGState()</span><br><span class="line">        </span><br><span class="line">    <span class="comment">// 5</span></span><br><span class="line">    clipRect.origin.x = clipRect.maxX</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这些代码做了这些事儿：</p>
+<ol>
+<li>先确保了 Graph View 拥有一个有效的 <code>fileDistribution</code>；</li>
+<li>遍历 <code>fileDistribution</code> 里的每一种文件类型；</li>
+<li>根据文件的占比计算蒙版的大小；</li>
+<li>存储图形上下文的状态，设置蒙版的大小，用文件类型对应的颜色绘制圆角矩形，并恢复图形上下文的状态；</li>
+<li>把剪切蒙版的 <strong>x</strong> 移动到正确的位置。</li>
+</ol>
+<p>你可能会奇怪：为什么要先存储，再恢复图形上下文？还记得「painter’s model」吗？你添加到图形上下文里的所有东西都会被保存在上下文中，就像你画在纸上的画，会一直在那里。</p>
+<p>如果你添加了多个剪切蒙版，事实上你是只创建了一个剪切蒙版，并应用到所有矩形上。要避免这种情况，你需要在添加新的剪切蒙版之前存储上下文的状态，等你使用完了这个蒙版，再把它恢复出来，再处理新的蒙版。</p>
+<p>此时，<strong>Xcode</strong> 会弹出一个警告，因为 <code>index</code> 从没被使用过。别担心，它的待会儿就会派上用场。</p>
+<p>编译并运行，或者直接打开 <strong>Main.storyboard</strong>：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-53339621371d124f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>哈哈，DiskInfo 功能似乎已经渐渐完善了呢～除了图例，这个条形图已经基本完工了👍。</p>
+<h2 id="绘制文本"><a href="#绘制文本" class="headerlink" title="绘制文本"></a>绘制文本</h2><p>在自定义视图里绘制文本特别简单，你需要为这个文本的各种属性创建一个字典，包含了字体、尺寸、颜色和对齐，把它传入 <code>String</code> 的 <code>draw(in:withAttributes:)</code> 方法。这些属性将会在我们计算矩形大小和位置的时候派上用场。</p>
+<p>打开 <strong>GraphView.swift</strong>，把这个属性添加到类的定义里：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">fileprivate</span> <span class="keyword">var</span> bytesFormatter = <span class="type">ByteCountFormatter</span>()</span><br></pre></td></tr></table></figure>
+<p>这将会创建一个 <strong>ByteCountFormatter</strong>。它会帮我们完成「把字节转化成人话」这个高深而繁重的工作。</p>
+<p>现在，在 <code>drawBarGraphInContext(context:)</code> 方法的 <code>for (index,fileType) in fileTypes.enumerated()</code> 循环里加入这些代码：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 1</span></span><br><span class="line"><span class="keyword">let</span> legendRectWidth = (barChartRect.size.width / <span class="type">CGFloat</span>(fileTypes.<span class="built_in">count</span>))</span><br><span class="line"><span class="keyword">let</span> legendOriginX = barChartRect.origin.x + floor(<span class="type">CGFloat</span>(index) * legendRectWidth)</span><br><span class="line"><span class="keyword">let</span> legendOriginY = barChartRect.minY - <span class="number">2</span> * <span class="type">Constants</span>.marginSize</span><br><span class="line"><span class="keyword">let</span> legendSquareRect = <span class="type">CGRect</span>(x: legendOriginX, y: legendOriginY,</span><br><span class="line">                              width: <span class="type">Constants</span>.barChartLegendSquareSize,</span><br><span class="line">                              height: <span class="type">Constants</span>.barChartLegendSquareSize)</span><br><span class="line"></span><br><span class="line"><span class="keyword">let</span> legendSquarePath = <span class="type">CGMutablePath</span>()</span><br><span class="line">legendSquarePath.addRect( legendSquareRect )</span><br><span class="line">context?.addPath(legendSquarePath)</span><br><span class="line">context?.setFillColor(fileTypeColors.fillColor.cgColor)</span><br><span class="line">context?.setStrokeColor(fileTypeColors.strokeColor.cgColor)</span><br><span class="line">context?.drawPath(using: .fillStroke)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 2</span></span><br><span class="line"><span class="keyword">let</span> paragraphStyle = <span class="type">NSMutableParagraphStyle</span>()</span><br><span class="line">paragraphStyle.lineBreakMode = .byTruncatingTail</span><br><span class="line">paragraphStyle.alignment = .<span class="keyword">left</span></span><br><span class="line"><span class="keyword">let</span> nameTextAttributes = [</span><br><span class="line">  <span class="type">NSFontAttributeName</span>: <span class="type">NSFont</span>.barChartLegendNameFont,</span><br><span class="line">  <span class="type">NSParagraphStyleAttributeName</span>: paragraphStyle]</span><br><span class="line"></span><br><span class="line"><span class="comment">// 3</span></span><br><span class="line"><span class="keyword">let</span> nameTextSize = fileType.name.size(withAttributes: nameTextAttributes)</span><br><span class="line"><span class="keyword">let</span> legendTextOriginX = legendSquareRect.maxX + <span class="type">Constants</span>.legendTextMargin</span><br><span class="line"><span class="keyword">let</span> legendTextOriginY = legendOriginY - <span class="number">2</span> * <span class="type">Constants</span>.pieChartBorderWidth</span><br><span class="line"><span class="keyword">let</span> legendNameRect = <span class="type">CGRect</span>(x: legendTextOriginX, y: legendTextOriginY,</span><br><span class="line">                            width: legendRectWidth - legendSquareRect.size.width - <span class="number">2</span> *</span><br><span class="line">                              <span class="type">Constants</span>.legendTextMargin,</span><br><span class="line">                            height: nameTextSize.height)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 4</span></span><br><span class="line">fileType.name.draw(<span class="keyword">in</span>: legendNameRect, withAttributes: nameTextAttributes)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 5</span></span><br><span class="line"><span class="keyword">let</span> bytesText = bytesFormatter.string(fromByteCount: fileTypeInfo.bytes)</span><br><span class="line"><span class="keyword">let</span> bytesTextAttributes = [</span><br><span class="line">  <span class="type">NSFontAttributeName</span>: <span class="type">NSFont</span>.barChartLegendSizeTextFont,</span><br><span class="line">  <span class="type">NSParagraphStyleAttributeName</span>: paragraphStyle,</span><br><span class="line">  <span class="type">NSForegroundColorAttributeName</span>: <span class="type">NSColor</span>.secondaryLabelColor]</span><br><span class="line"><span class="keyword">let</span> bytesTextSize = bytesText.size(withAttributes: bytesTextAttributes)</span><br><span class="line"><span class="keyword">let</span> bytesTextRect = legendNameRect.offsetBy(dx: <span class="number">0.0</span>, dy: -bytesTextSize.height)</span><br><span class="line">bytesText.draw(<span class="keyword">in</span>: bytesTextRect, withAttributes: bytesTextAttributes)</span><br></pre></td></tr></table></figure>
+<p>看起来这一大堆代码还挺唬人的，其实很简单：</p>
+<ol>
+<li>你已经很熟悉这一段代码了：计算图例的彩色方块的位置，为它创建一条路径，并用对应的颜色填充；</li>
+<li>创建一个字典，包含了两个属性：字体和 <code>NSMutableParagraphStyle</code>。后者会定义这些文本会怎样在给定的矩形里被绘制出来。在这个例子中，文本会显示为左对齐，且若文本超出了矩形范围，系统会在他的末尾加上省略号；</li>
+<li>计算用于绘制文本的矩形的位置和大小；</li>
+<li>调用 <code>draw(in:withAttributes:)</code>，绘制文本；</li>
+<li>使用 <code>bytesFormatter</code> 获取文本，并设置「文件大小」的文本的属性。这和之前唯一的区别是：这个文本用 <code>NSFontAttributeName</code> 设置了一个不同的颜色。</li>
+</ol>
+<p>编译并运行，或者前往 <strong>Main.storyboard</strong>。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-bf60da1d58848b16.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>热烈祝贺条形图杀青成功！你现在可以调整一下窗口的大小，看看图例里的文本时如何给自己加上省略号来适应狭小的空间的。</p>
+<p>给自己鼓个掌吧👏～</p>
+<h1 id="Cocoa-Drawing"><a href="#Cocoa-Drawing" class="headerlink" title="Cocoa Drawing"></a>Cocoa Drawing</h1><p><strong>macOS</strong> 还提供了使用 <strong>AppKit</strong> 的框架来进行绘制的选项。它将会提供更高层的抽象绘图法。它使用各种类来代替 <strong>C 语言</strong>的函数，它还包含了许多 Helper 方法来更轻松地应对常见绘图任务。在两个框架中，图形上下文是一样的。如果你对 Core Graphics 很熟悉的话，你应该能很轻松地掌握 Cocoa Drawing。</p>
+<p>和 Core Graphics 一样，你需要创建并绘制路径，但在 Cocoa Drawing，我们使用 <code>NSBezierPath</code>，它和 <code>CGPathRef</code> 是一样的。</p>
+<p>我们要绘制的饼图是这样的：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-e246d4795e5dec1b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>你需要分三步来绘制它：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-bda1ff3ab8d8e064.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<ol>
+<li>创建一条圆形的路径，用于显示总硬盘空间，然后用定义好的颜色绘制它；</li>
+<li>为已用空间创建一条路径，并绘制它；</li>
+<li>为已用空间的路径绘制一个渐变填充。</li>
+</ol>
+<p>打开 <strong>GraphView.swift</strong>，把这个方法添加到用于绘制的 extension 里：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">drawPieChart</span><span class="params">()</span></span> &#123;</span><br><span class="line">  <span class="keyword">guard</span> <span class="keyword">let</span> fileDistribution = fileDistribution <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 1</span></span><br><span class="line">  <span class="keyword">let</span> rect = pieChartRectangle()</span><br><span class="line">  <span class="keyword">let</span> circle = <span class="type">NSBezierPath</span>(ovalIn: rect)</span><br><span class="line">  pieChartAvailableFillColor.setFill()</span><br><span class="line">  pieChartAvailableLineColor.setStroke()</span><br><span class="line">  circle.stroke()</span><br><span class="line">  circle.fill()</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 2</span></span><br><span class="line">  <span class="keyword">let</span> path = <span class="type">NSBezierPath</span>()</span><br><span class="line">  <span class="keyword">let</span> center = <span class="type">CGPoint</span>(x: rect.midX, y: rect.midY)</span><br><span class="line">  <span class="keyword">let</span> usedPercent = <span class="type">Double</span>(fileDistribution.capacity - fileDistribution.available) /</span><br><span class="line">    <span class="type">Double</span>(fileDistribution.capacity)</span><br><span class="line">  <span class="keyword">let</span> endAngle = <span class="type">CGFloat</span>(<span class="number">360</span> * usedPercent)</span><br><span class="line">  <span class="keyword">let</span> radius = rect.size.width / <span class="number">2.0</span></span><br><span class="line">  path.move(to: center)</span><br><span class="line">  path.line(to: <span class="type">CGPoint</span>(x: rect.maxX, y: center.y))</span><br><span class="line">  path.appendArc(withCenter: center, radius: radius,</span><br><span class="line">                                         startAngle: <span class="number">0</span>, endAngle: endAngle)</span><br><span class="line">  path.close()</span><br><span class="line">  </span><br><span class="line">  <span class="comment">// 3</span></span><br><span class="line">  pieChartUsedLineColor.setStroke()</span><br><span class="line">  path.stroke()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们来分析一下这段代码：</p>
+<ol>
+<li>用 <code>init(ovalIn:)</code> 构造方法创建一条圆形的路径，设置它的填充颜色和笔触颜色，然后绘制这条路径；</li>
+<li>为已用空间创建一条路径：<ul>
+<li>根据已用空间计算扇形的角度；</li>
+<li>移动到大圆的圆心；</li>
+<li>添加一条从圆心到圆的右顶点的线段；</li>
+<li>根据之前计算的角度添加一条圆弧；</li>
+<li>闭合图形，也就是从圆弧的终点连接到圆心；</li>
+</ul>
+</li>
+<li>调用 <code>stroke()</code> 方法，设置笔触颜色；</li>
+</ol>
+<p>你应该能发现这段代码和之前的区别：</p>
+<ul>
+<li>代码中没有提到过图形上下文，因为我们调用的方法会自动获取当前的上下文，在这个例子中，就是视图自己的图形上下文；</li>
+<li>角是以角度制计算，而不是弧度制。<strong>CGFloat+Radians.swift</strong> 扩展了 CGFloat 类来进行了自动转换。</li>
+</ul>
+<p>现在把这行代码添加到 <code>draw(_:)</code> 方法中来绘制饼图：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">drawPieChart()</span><br></pre></td></tr></table></figure>
+<p>编译并运行：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-5169614dde1ef08a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>进展不错！</p>
+<h2 id="绘制渐变"><a href="#绘制渐变" class="headerlink" title="绘制渐变"></a>绘制渐变</h2><p><strong>Cocoa Drawing</strong> 使用 <code>NSGradient</code> 来绘制渐变。</p>
+<p>你需要在已使用的扇形里绘制渐变，该怎么实现呢……🤔？</p>
+<p>没错，用剪切蒙版啊！</p>
+<p>你已经创建了一条路径来绘制已用空间的扇形，在我们绘制渐变之前，先来把它用作剪切蒙版。</p>
+<p>把这些代码添加到 <code>drawPieChart()</code> 方法中：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> <span class="keyword">let</span> gradient = <span class="type">NSGradient</span>(starting: pieChartGradientStartColor,</span><br><span class="line">                             ending: pieChartGradientEndColor) &#123;</span><br><span class="line">  gradient.draw(<span class="keyword">in</span>: path, angle: <span class="type">Constants</span>.pieChartGradientAngle)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>第一行代码会试着去创建一个两种颜色构成的渐变。如果创建成功了，就会调用 <code>draw(in:angle:)</code> 方法来绘制它。在大括号里，这个方法会设置蒙版，并在蒙版区域内绘制渐变。是不是特别棒～</p>
+<p>编译并运行：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-27ddddbb77a21564.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<h1 id="练习-挑战：绘制饼图的图例"><a href="#练习-挑战：绘制饼图的图例" class="headerlink" title="练习/挑战：绘制饼图的图例"></a>练习/挑战：绘制饼图的图例</h1><p>现在我们的自定义视图已经越来越完美了，但还有一个待办事项：绘制饼图的图例，也就是其内部的文字说明。</p>
+<p>你已经知道该怎么去做了，准备好接受挑战了嘛💪？</p>
+<p>一些小提示：</p>
+<ol>
+<li>使用 <code>bytesFormatter</code> 来获取硬盘的可用空间（<code>fileDistribution.available</code> 属性）和总空间（<code>fileDistribution.capacity</code> 属性）；</li>
+<li>计算文本的位置，确保你的文本显示在各个扇形的中央；</li>
+<li>在计算好的位置用以下属性绘制文本：<ul>
+<li>Font：<code>NSFont.pieChartLegendFont</code>；</li>
+<li>Used space text color：<code>NSColor.pieChartUsedSpaceTextColor</code>；</li>
+<li>Available space text color：<code>NSColor.pieChartAvailableSpaceTextColor</code>。  </li>
+</ul>
+</li>
+</ol>
+<h1 id="答案：绘制图例"><a href="#答案：绘制图例" class="headerlink" title="答案：绘制图例"></a>答案：绘制图例</h1><p>把这些代码添加到 <code>drawPieChart()</code> 方法中：</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 1</span></span><br><span class="line"><span class="keyword">let</span> usedMidAngle = endAngle / <span class="number">2.0</span></span><br><span class="line"><span class="keyword">let</span> availableMidAngle = (<span class="number">360.0</span> - endAngle) / <span class="number">2.0</span></span><br><span class="line"><span class="keyword">let</span> halfRadius = radius / <span class="number">2.0</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 2</span></span><br><span class="line"><span class="keyword">let</span> usedSpaceText = bytesFormatter.string(fromByteCount: fileDistribution.capacity)</span><br><span class="line"><span class="keyword">let</span> usedSpaceTextAttributes = [</span><br><span class="line">  <span class="type">NSFontAttributeName</span>: <span class="type">NSFont</span>.pieChartLegendFont,</span><br><span class="line">  <span class="type">NSForegroundColorAttributeName</span>: <span class="type">NSColor</span>.pieChartUsedSpaceTextColor]</span><br><span class="line"><span class="keyword">let</span> usedSpaceTextSize = usedSpaceText.size(withAttributes: usedSpaceTextAttributes)</span><br><span class="line"><span class="keyword">let</span> xPos = rect.midX + <span class="type">CGFloat</span>(cos(usedMidAngle.radians)) *</span><br><span class="line">  halfRadius - (usedSpaceTextSize.width / <span class="number">2.0</span>)</span><br><span class="line"><span class="keyword">let</span> yPos = rect.midY + <span class="type">CGFloat</span>(sin(usedMidAngle.radians)) *</span><br><span class="line">  halfRadius - (usedSpaceTextSize.height / <span class="number">2.0</span>)</span><br><span class="line">usedSpaceText.draw(at: <span class="type">CGPoint</span>(x: xPos, y: yPos),</span><br><span class="line">                   withAttributes: usedSpaceTextAttributes)</span><br><span class="line"></span><br><span class="line"><span class="comment">// 3</span></span><br><span class="line"><span class="keyword">let</span> availableSpaceText = bytesFormatter.string(fromByteCount: fileDistribution.available)</span><br><span class="line"><span class="keyword">let</span> availableSpaceTextAttributes = [</span><br><span class="line">  <span class="type">NSFontAttributeName</span>: <span class="type">NSFont</span>.pieChartLegendFont,</span><br><span class="line">  <span class="type">NSForegroundColorAttributeName</span>: <span class="type">NSColor</span>.pieChartAvailableSpaceTextColor]</span><br><span class="line"><span class="keyword">let</span> availableSpaceTextSize = availableSpaceText.size(withAttributes: availableSpaceTextAttributes)</span><br><span class="line"><span class="keyword">let</span> availableXPos = rect.midX + cos(-availableMidAngle.radians) *</span><br><span class="line">  halfRadius - (availableSpaceTextSize.width / <span class="number">2.0</span>)</span><br><span class="line"><span class="keyword">let</span> availableYPos = rect.midY + sin(-availableMidAngle.radians) *</span><br><span class="line">  halfRadius - (availableSpaceTextSize.height / <span class="number">2.0</span>)</span><br><span class="line">availableSpaceText.draw(at: <span class="type">CGPoint</span>(x: availableXPos, y: availableYPos),</span><br><span class="line">                        withAttributes: availableSpaceTextAttributes)</span><br></pre></td></tr></table></figure>
+<p>代码含义：</p>
+<ol>
+<li>计算两个区域的角度；</li>
+<li>创建已用空间的文本的属性，并计算其 <em>x</em> 和 <em>y</em>，然后绘制它；</li>
+<li>创建总空间的文本的属性，并计算其 <em>x</em> 和 <em>y</em>，然后绘制它；</li>
+</ol>
+<p>现在，编译并运行你的 app，好好欣赏一下你的杰出作品：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="http://upload-images.jianshu.io/upload_images/5477931-2b67c2e23ffc4526.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>恭喜你！你使用 Core Graphics 和 Cocoa Drawing 创建了一个美丽的 app！</p>
+<h1 id="接下来该做啥？"><a href="#接下来该做啥？" class="headerlink" title="接下来该做啥？"></a>接下来该做啥？</h1><p>你可以<a href="https://koenig-media.raywenderlich.com/uploads/2016/06/DiskInfo-Final.zip" target="_blank" rel="noopener">点击这里</a>下载完整的工程文件。</p>
+<p>这个 macOS Core Graphics 教程覆盖了 macOS 中用于绘制自定义视图的不同框架的基本知识：</p>
+<ul>
+<li>如何使用 Core Graphics 和 Cocoa Drawing 创建和绘制路径；</li>
+<li>如何剪切一个区域；</li>
+<li>如何绘制文本串；</li>
+<li>如何绘制渐变。</li>
+</ul>
+<p>之后的日子里，当你需要创建一些整洁、优美的用户界面的时候，你应该能自信地拿出 Core Graphics 和 Cocoa Drawing 挥洒创意了。</p>
+<p>如果你还想继续深入，可以参考这些资源：</p>
+<ul>
+<li>Apple 的 <a href="https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/CocoaDrawingGuide/Introduction/Introduction.html" target="_blank" rel="noopener">Introduction to Cocoa Drawing Guide</a></li>
+<li>Apple 的 <a href="https://developer.apple.com/library/mac/documentation/GraphicsImaging/Conceptual/drawingwithquartz2d/Introduction/Introduction.html" target="_blank" rel="noopener">Quartz 2D Programming Guide</a></li>
+</ul>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-07-19T05:03:34.684Z" itemprop="dateUpdated">2019-07-19 13:03:34</time>
+</span><br>
+
+
+        
+    </div>
+    
+    <footer>
+        <a href="https://sr2k.top/blog">
+            <img src="data:image/jpeg;base64,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" alt="Siyuan Cao">
+            Siyuan Cao
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/Ray-Wenderlich/">Ray Wenderlich</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/Swift/">Swift</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/macOS/">macOS</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/翻译/">翻译</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://sr2k.top/blog/2017/09/25/译-macOS上的CoreGraphics入门教程/&title=《【译】macOS 上的 Core Graphics 入门教程》 — SR2k&pic=https://sr2k.top/blogdata:image/jpeg;base64,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" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://sr2k.top/blog/2017/09/25/译-macOS上的CoreGraphics入门教程/&title=《【译】macOS 上的 Core Graphics 入门教程》 — SR2k&source=Siyuan 先生の日常杂杂碎" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://sr2k.top/blog/2017/09/25/译-macOS上的CoreGraphics入门教程/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《【译】macOS 上的 Core Graphics 入门教程》 — SR2k&url=https://sr2k.top/blog/2017/09/25/译-macOS上的CoreGraphics入门教程/&via=https://sr2k.top/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://sr2k.top/blog/2017/09/25/译-macOS上的CoreGraphics入门教程/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between">
+  
+    <div class="waves-block waves-effect prev">
+      <a href="/blog/2017/10/10/译-如何在macOS上使用NSTouchBar/" id="post-prev" class="post-nav-link">
+        <div class="tips"><i class="icon icon-angle-left icon-lg icon-pr"></i> Prev</div>
+        <h4 class="title">【译】如何在 macOS 上使用 NSTouchBar</h4>
+      </a>
+    </div>
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/blog/2017/09/24/译-NSCollectionView入门教程/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">【译】NSCollectionView 入门教程</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/blog/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>Siyuan Cao &copy; 2015 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://sr2k.top/blog/2017/09/25/译-macOS上的CoreGraphics入门教程/&title=《【译】macOS 上的 Core Graphics 入门教程》 — SR2k&pic=https://sr2k.top/blogdata:image/jpeg;base64,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" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://sr2k.top/blog/2017/09/25/译-macOS上的CoreGraphics入门教程/&title=《【译】macOS 上的 Core Graphics 入门教程》 — SR2k&source=Siyuan 先生の日常杂杂碎" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://sr2k.top/blog/2017/09/25/译-macOS上的CoreGraphics入门教程/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《【译】macOS 上的 Core Graphics 入门教程》 — SR2k&url=https://sr2k.top/blog/2017/09/25/译-macOS上的CoreGraphics入门教程/&via=https://sr2k.top/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://sr2k.top/blog/2017/09/25/译-macOS上的CoreGraphics入门教程/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACrElEQVR42u3aQXICMQwEwPz/0+QBsMtIsqg9NCcqibHbqVqLsf7+4tfr7fX+2/v3Vz+5GvU+19XYAy88PDy88dKvPvp+yuRz8i1IRiVz4eHh4e3xkof1fIm94yc/JPDw8PCeybvHJKTqUZSsAQ8PD+/JvFNje8cDHh4e3nN4yWP6fkETXhL4rmcteHh4eDEvf1g/5/3K/R4eHh7e+Fa9FzGcbTjID4MPc+Hh4eEt8Kolb69QTsrx+3ChFxDj4eHhbfB67Va9C7D8b5IAIgpz8fDw8JZ5SQCRh62TxqlTxxIeHh7eHq/XHJBf80+CiTyS+DAWDw8Pb4GXHwD5sZE0S/U25djdHR4eHt5Cr1FezuYxaz6qeoREV194eHh4h3h7ZXEefPSK7EJMjIeHh/dDXn5g5EV5L8ZtwvDw8PAWePNH/CSAyKm9Yh0PDw9vg5dHD9VmqWqQcTY9wMPDw9vj9ZZbrVfnAURvc/Hw8PA2eHm5PF/WJIrtXbPh4eHhbfDul94rdqsRw6T54Mvn4OHh4S3zktJ50hwwiYmbW4yHh4e3xjt7AZYU3NWiuVmO4+Hh4a3xCkVqKyPthRq9UPhLGIGHh4c35lXL4sJVU9yI0NvWPPLAw8PD2+PlUWy5kysupiftBV/+DXh4eHhHeXkwmh8M86hi1FzVy33x8PDwBoVvPln1Cq1adlc3Cw8PD+/3vLxcrk5/KuAoNxzg4eHhHeW9iq9JBTs/csrNWHh4eHgLvPlVVh4W5MtKAuXJSvDw8PDmvGpBPGmZqm5Z9WDAw8PD+yUviWKTS6kkdOht1j37chQeHh7eA3j5F/4kbujNch8i4+Hh4T2NdwpTnaV6wYaHh4e3zUsGTxqz8jaCyUF1eTDg4eHhHeVVv/Dnf5MvKN+geXiBh4eHN+D9AxJyILVWTFbsAAAAAElFTkSuQmCC" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
+
+
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>
