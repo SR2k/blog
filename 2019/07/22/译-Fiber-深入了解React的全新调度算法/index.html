@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>【译】Fiber：深入了解 React 的全新调度算法 | SR2k</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#F37327">
+    
+    
+    <meta name="keywords" content="JavaScript,React,翻译">
+    <meta name="description" content="React 是一个用来制作 UI 的 JavaScript 库，其核心是跟踪组件状态的变化，并将其更新在屏幕上的机制机制，在 React 中，这一过程被称为协调。每当我们调用 setState 时，React 都会检测 state 和 props 是否发生了变化，并在 UI 中重新渲染组件。 React 的文档很好地提供了这个机制的大致简介：整个过程中 React 元素的担当角色、生命周期方法和">
+<meta name="keywords" content="JavaScript,React,翻译">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【译】Fiber：深入了解 React 的全新调度算法">
+<meta property="og:url" content="https://sr2k.top/blog/2019/07/22/译-Fiber-深入了解React的全新调度算法/index.html">
+<meta property="og:site_name" content="SR2k">
+<meta property="og:description" content="React 是一个用来制作 UI 的 JavaScript 库，其核心是跟踪组件状态的变化，并将其更新在屏幕上的机制机制，在 React 中，这一过程被称为协调。每当我们调用 setState 时，React 都会检测 state 和 props 是否发生了变化，并在 UI 中重新渲染组件。 React 的文档很好地提供了这个机制的大致简介：整个过程中 React 元素的担当角色、生命周期方法和">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://sr2k.top/blog/2019/07/22/译-Fiber-深入了解React的全新调度算法/demo.gif">
+<meta property="og:image" content="https://sr2k.top/blog/2019/07/22/译-Fiber-深入了解React的全新调度算法/fiber-tree.png">
+<meta property="og:image" content="https://sr2k.top/blog/2019/07/22/译-Fiber-深入了解React的全新调度算法/effect-link-in-tree.png">
+<meta property="og:image" content="https://sr2k.top/blog/2019/07/22/译-Fiber-深入了解React的全新调度算法/effect-link.png">
+<meta property="og:image" content="https://sr2k.top/blog/2019/07/22/译-Fiber-深入了解React的全新调度算法/algo.gif">
+<meta property="og:updated_time" content="2019-07-22T03:17:57.952Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="【译】Fiber：深入了解 React 的全新调度算法">
+<meta name="twitter:description" content="React 是一个用来制作 UI 的 JavaScript 库，其核心是跟踪组件状态的变化，并将其更新在屏幕上的机制机制，在 React 中，这一过程被称为协调。每当我们调用 setState 时，React 都会检测 state 和 props 是否发生了变化，并在 UI 中重新渲染组件。 React 的文档很好地提供了这个机制的大致简介：整个过程中 React 元素的担当角色、生命周期方法和">
+<meta name="twitter:image" content="https://sr2k.top/blog/2019/07/22/译-Fiber-深入了解React的全新调度算法/demo.gif">
+    
+        <link rel="alternate" type="application/atom+xml" title="SR2k" href="/blog/atom.xml">
+    
+    <link rel="shortcut icon" href="/blog/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+</head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/blog/img/brand.jpg)">
+      <div class="brand">
+        <a href="/blog/" class="avatar waves-effect waves-circle waves-light">
+          <img src="data:image/jpeg;base64,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">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Siyuan Cao</h5>
+          <a href="mailto:seeran@outlook.com" title="seeran@outlook.com" class="mail">seeran@outlook.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                存档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/blog/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/SR2k" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://weibo.com/234970213" target="_blank" >
+                <i class="icon icon-lg icon-weibo"></i>
+                Weibo
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://sr2k.top"  >
+                <i class="icon icon-lg icon-male"></i>
+                简历
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">【译】Fiber：深入了解 React 的全新调度算法</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">【译】Fiber：深入了解 React 的全新调度算法</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2019-07-22T03:08:26.000Z" itemprop="datePublished" class="page-time">
+  2019-07-22
+</time>
+
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#背景"><span class="post-toc-number">1.</span> <span class="post-toc-text">背景</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#从-React-元素到-Fiber-节点"><span class="post-toc-number">2.</span> <span class="post-toc-text">从 React 元素到 Fiber 节点</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#React-元素"><span class="post-toc-number">2.1.</span> <span class="post-toc-text">React 元素</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Fiber-节点"><span class="post-toc-number">2.2.</span> <span class="post-toc-text">Fiber 节点</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Current-树和-workInProgress-树"><span class="post-toc-number">2.3.</span> <span class="post-toc-text">Current 树和 workInProgress 树</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#副作用"><span class="post-toc-number">2.4.</span> <span class="post-toc-text">副作用</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#副作用链表"><span class="post-toc-number">2.5.</span> <span class="post-toc-text">副作用链表</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Fiber-树的根"><span class="post-toc-number">2.6.</span> <span class="post-toc-text">Fiber 树的根</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Fiber-节点的结构"><span class="post-toc-number">2.7.</span> <span class="post-toc-text">Fiber 节点的结构</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#算法概况"><span class="post-toc-number">3.</span> <span class="post-toc-text">算法概况</span></a></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Render-阶段"><span class="post-toc-number">4.</span> <span class="post-toc-text">Render 阶段</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#事务循环的主要流程"><span class="post-toc-number">4.1.</span> <span class="post-toc-text">事务循环的主要流程</span></a></li></ol></li><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Commit-阶段"><span class="post-toc-number">5.</span> <span class="post-toc-text">Commit 阶段</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#挂载前生命周期方法"><span class="post-toc-number">5.1.</span> <span class="post-toc-text">挂载前生命周期方法</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#DOM-更新"><span class="post-toc-number">5.2.</span> <span class="post-toc-text">DOM 更新</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#挂载后生命周期方法"><span class="post-toc-number">5.3.</span> <span class="post-toc-text">挂载后生命周期方法</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-译-Fiber-深入了解React的全新调度算法"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">【译】Fiber：深入了解 React 的全新调度算法</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2019-07-22 11:08:26" datetime="2019-07-22T03:08:26.000Z"  itemprop="datePublished">2019-07-22</time>
+
+            
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <p>React 是一个用来制作 UI 的 JavaScript 库，其核心是跟踪组件状态的变化，并将其更新在屏幕上的机制<a href="https://medium.freecodecamp.org/what-every-front-end-developer-should-know-about-change-detection-in-angular-and-react-508f83f58c6a" target="_blank" rel="noopener">机制</a>，在 React 中，这一过程被称为<strong>协调</strong>。每当我们调用 <code>setState</code> 时，React 都会检测 state 和 props 是否发生了变化，并在 UI 中重新渲染组件。</p>
+<p>React 的文档很好地提供了这个机制的<a href="https://reactjs.org/docs/reconciliation.html" target="_blank" rel="noopener">大致简介</a>：整个过程中 React 元素的担当角色、生命周期方法和 <code>render</code> 方法，以及对各个子组件实施的 diff 算法。<code>render</code> 方法返回的这些不可变的 React 元素树通常被我们称为「virtual DOM」。在以前，这个术语帮助我们理解了 React 的工作模式，但也带来了许多困惑，所以现在 React 的文档已经不再使用它了，所以本文将会将他们称作「React 元素树」。</p>
+<p>为了维护状态，除了 React 元素树，React 同时也维护着一些内部实例（如组件、DOM 节点等）构成的树。自 v16 开始，React 推出了一种全新的维护内部实例树的算法实现，并取代号为「<strong>Fiber</strong>」。要想了解 Fiber 架构带来的种种好处，你可以看这篇文章：<a href="https://medium.com/dailyjs/the-how-and-why-on-reacts-usage-of-linked-list-in-fiber-67f1014d0eb7" target="_blank" rel="noopener">《React 在 Fiber 中使用链表的原因和方法》</a>。</p>
+<blockquote>
+<p>如果没有 <a href="https://medium.com/u/a3a8af6addc1" target="_blank" rel="noopener">Dan Abramov</a> 的帮助，这篇文章得花多得多的时间才能完成，而且全面性也会大打折扣！<em>👍</em></p>
+</blockquote>
+<p>这是 React 内部架构系列教程的第一篇。在这篇文章中，我会深入介绍与核心算法有关的重要概念和数据结构。当我们了解地足够多的时候，我们会开始探索取得和操作 Fiber 树的算法和主要函数。这个系列的下一篇文章将会演示 React 是如何使用这个算法来实施初次渲染，并处理 state 和 props 的。从那开始我们将移步调度器的种种细节，以及实现副作用列表的机制。</p>
+<p><a href="https://twitter.com/maxkoretskyi" target="_blank" rel="noopener"><strong>关注我获得最新消息！</strong></a></p>
+<p>本文会介绍许多进阶知识 🧙‍。我鼓励你阅读本文，并理解 React 工作时的各种黑魔法。如果你打算为 React 作出贡献，这一系列文章也会是一个很好的指南。我是<a href="https://blog.angularindepth.com/level-up-your-reverse-engineering-skills-8f910ae10630" target="_blank" rel="noopener">逆向工程的重视拥趸</a>，所以这儿会有许多指向 React 16.6.0 源码的链接。</p>
+<p>要学的东西很多，所以如果你感觉有压力，或者对有些东西现在还不太理解，请多花点时间，因为这很值得。<strong>需要注意的是你不需要这里的任何知识来使用 React，这篇文章只关乎 React 的内部实现原理。</strong></p>
+<blockquote>
+<p>我在 <a href="https://react-grid.ag-grid.com/?utm_source=medium&amp;utm_medium=blog&amp;utm_campaign=reactcustom" target="_blank" rel="noopener"><strong>ag-Grid</strong></a> 担任技术推广工程师。 If you’re curious to learn about data grids or looking for the ultimate React data grid solution, get in touch or give it a try with the guide “<a href="https://blog.ag-grid.com/react-get-started-with-react-grid-in-5-minutes/?utm_source=medium&amp;utm_medium=blog&amp;utm_campaign=getstartedangular" target="_blank" rel="noopener"><strong>Get started with React grid in 5 minutes</strong></a>”. I’m happy to answer any questions you may have.</p>
+</blockquote>
+<h1 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h1><p>本文的示例是这样一个应用——界面上有一个按钮，点击它以后数字会增加，并在屏幕上渲染出来：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="./demo.gif" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>以及它的代码如下：</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ClickCounter</span> <span class="keyword">extends</span> <span class="title">React</span>.<span class="title">Component</span> </span>&#123;</span><br><span class="line">  <span class="keyword">constructor</span>(props) &#123;</span><br><span class="line">    <span class="keyword">super</span>(props);</span><br><span class="line">    <span class="keyword">this</span>.state = &#123;<span class="attr">count</span>: <span class="number">0</span>&#125;;</span><br><span class="line">    <span class="keyword">this</span>.handleClick = <span class="keyword">this</span>.handleClick.bind(<span class="keyword">this</span>);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  handleClick() &#123;</span><br><span class="line">    <span class="keyword">this</span>.setState(<span class="function">(<span class="params">state</span>) =&gt;</span> &#123;</span><br><span class="line">      <span class="keyword">return</span> &#123;<span class="attr">count</span>: state.count + <span class="number">1</span>&#125;;</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  render() &#123;</span><br><span class="line">    <span class="keyword">return</span> [</span><br><span class="line">      &lt;button key=<span class="string">"1"</span> onClick=&#123;<span class="keyword">this</span>.handleClick&#125;&gt;Update counter&lt;<span class="regexp">/button&gt;,</span></span><br><span class="line"><span class="regexp">      &lt;span key="2"&gt;&#123;this.state.count&#125;&lt;/</span>span&gt;</span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>你可以在<a href="https://stackblitz.com/edit/react-t4rdmh" target="_blank" rel="noopener">这里</a>把玩一下这个例子，它就是一个简单的组件，在其 <code>render</code> 方法中返回 <code>button</code> 和 <code>span</code> 两个元素。当你点击按钮时，事件处理器会更新组件的 state，然后作为结果，<code>span</code> 元素中的文字会被更新。</p>
+<p>React 在<strong>协调</strong>的过程中会做很多事情，比如在我们的示例 app 中，React 会在初次渲染完成后以及 state 被更新后做的事情大致包括：</p>
+<ul>
+<li>在 <code>ClickCounter</code> 中更新 <code>count</code> 属性；</li>
+<li>找到 <code>ClickCounter</code> 和其 props，并进行比较；</li>
+<li>更新 <code>span</code> 元素的 props。</li>
+</ul>
+<p><strong>协调</strong>的过程中还会发生其他事情，如调用<a href="https://reactjs.org/docs/react-component.html#updating" target="_blank" rel="noopener">生命周期方法</a>和更新<a href="https://reactjs.org/docs/refs-and-the-dom.html" target="_blank" rel="noopener">引用（refs）</a>。<strong>在 Fiber 架构中，这些事情都统一地被称为「事务」。</strong>事务的种类通常取决于 React 元素的种类，例如对于一个类组件，React 需要创建一个实例，但是函数组件就不需要。你肯定知道，React 中有很多种元素，如类和函数组件、宿主组件（也就是 DOM 节点）、Portal 等。<a href="https://github.com/facebook/react/blob/b87aabdfe1b7461e7331abb3601d9e6bb27544bc/packages/react/src/ReactElement.js#L171" target="_blank" rel="noopener"><code>createElement</code></a> 方法的第一个参数决定了 React 元素的种类，这个方法一般用于在 <code>render</code> 方法中创建 React 元素。</p>
+<p>在开始探索 Fiber 算法和事物之前，我们现来熟悉一下 React 内部使用的数据结构。</p>
+<h1 id="从-React-元素到-Fiber-节点"><a href="#从-React-元素到-Fiber-节点" class="headerlink" title="从 React 元素到 Fiber 节点"></a>从 React 元素到 Fiber 节点</h1><p>React 中每个元素都具有一个 UI 上的表现，我们可以称作「视图」或者「模板」。例如我们示例中 <code>ClickCounter</code> 组件的模板就是：</p>
+<figure class="highlight jsx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;button key=<span class="string">"1"</span> onClick=&#123;<span class="keyword">this</span>.onClick&#125;&gt;Update counter&lt;<span class="regexp">/button&gt;</span></span><br><span class="line"><span class="regexp">&lt;span key="2"&gt;&#123;this.state.count&#125;&lt;/</span>span&gt;</span><br></pre></td></tr></table></figure>
+<h2 id="React-元素"><a href="#React-元素" class="headerlink" title="React 元素"></a>React 元素</h2><p>模板经过 JSX 编译器后，你就得到了一系列 React 元素，这些元素才是你真正在 React 组件中 <code>render</code> 方法返回的东西，而不是看起来的 HTML。由于 JSX 并不是非用不可的，<code>ClickCounter</code> 组件的 <code>render</code> 方法其实也可以重写成这样：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ClickCounter</span> </span>&#123;</span><br><span class="line">  ...</span><br><span class="line">  render() &#123;</span><br><span class="line">  	<span class="keyword">return</span> [</span><br><span class="line">      React.createElement(</span><br><span class="line">        <span class="string">'button'</span>,</span><br><span class="line">        &#123;</span><br><span class="line">          key: <span class="string">'1'</span>,</span><br><span class="line">          onClick: <span class="keyword">this</span>.onClick</span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="string">'Update counter'</span></span><br><span class="line">      ),</span><br><span class="line">      React.createElement(</span><br><span class="line">        <span class="string">'span'</span>,</span><br><span class="line">        &#123;</span><br><span class="line">          key: <span class="string">'2'</span></span><br><span class="line">        &#125;,</span><br><span class="line">        <span class="keyword">this</span>.state.count</span><br><span class="line">      )</span><br><span class="line">    ]</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>render</code> 方法中调用的  <code>React.createElement</code> 函数将会创建一个这样的数据结构：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">[</span><br><span class="line">  &#123;</span><br><span class="line">    $$<span class="keyword">typeof</span>: <span class="built_in">Symbol</span>(react.element),</span><br><span class="line">    type: <span class="string">'button'</span>,</span><br><span class="line">    key: <span class="string">"1"</span>,</span><br><span class="line">    props: &#123;</span><br><span class="line">      children: <span class="string">'Update counter'</span>,</span><br><span class="line">      onClick: <span class="function"><span class="params">()</span> =&gt;</span> &#123; ... &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;,</span><br><span class="line">  &#123;</span><br><span class="line">    $$<span class="keyword">typeof</span>: <span class="built_in">Symbol</span>(react.element),</span><br><span class="line">    type: <span class="string">'span'</span>,</span><br><span class="line">    key: <span class="string">"2"</span>,</span><br><span class="line">    props: &#123;</span><br><span class="line">      children: <span class="number">0</span></span><br><span class="line">  	&#125;</span><br><span class="line">	&#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>可以看到，React 给这些对象加上了 <code>$$typeof</code> 属性来将其标记为 React 元素。接下来是用来描述一个元素 <code>type</code>、<code>key</code> 和 <code>props</code> 属性，它们的值取决于你传递给 <code>React.createElement</code> 方法的参数。请注意一下这里 React 会将字符串也作为 <code>span</code> 和 <code>button</code> 节点的子节点，而点击事件处理器则会被放置在 <code>button</code> 的 props 中。React 元素还会有一些字段如 <code>ref</code>，但是他们与这篇文章讨论的范畴无关。</p>
+<p><code>ClickCounter</code> 对应的 React 元素没有任何 props 或 key：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  $$<span class="keyword">typeof</span>: <span class="built_in">Symbol</span>(react.element),</span><br><span class="line">  key: <span class="literal">null</span>,</span><br><span class="line">  props: &#123;&#125;,</span><br><span class="line">  ref: <span class="literal">null</span>,</span><br><span class="line">  type: ClickCounter</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Fiber-节点"><a href="#Fiber-节点" class="headerlink" title="Fiber 节点"></a>Fiber 节点</h2><p>在<strong>协调</strong>的过程中，每个 React 元素的 <code>render</code> 方法返回的数据会被合并至 Fiber 节点树，每个 React 元素都有一个与之对应的 Fiber 节点。与 React 元素不同的是，Fiber 并不是每次渲染都会重新生成，它们是保存着组件状态和 DOM 的可变数据结构。</p>
+<p>前边我们说到过，React 元素类型的不同会导致 React 需要进行不同的操作。在我们的示例中，类组件 <code>ClickCounter</code> 会被调用生命周期方法和 <code>render</code> 方法；然而对于 <code>span</code> 这种宿主节点（DOM 节点），React 则会进行 DOM 的更新。所以每个 React 元素都会被转化成<a href="https://github.com/facebook/react/blob/769b1f270e1251d9dbdce0fcbd9e92e502d059b8/packages/shared/ReactWorkTags.js" target="_blank" rel="noopener">对应类型</a>的 Fiber 节点，后者会描述需要进行的事务。</p>
+<p><strong>你可以认为 Fiber 节点就是一种代表需要进行的事务的数据结构，换言之也就是事务的最小单位。Fiber 架构同时还使得跟踪、安排、暂停和终止事务变得简单。</strong></p>
+<p>当一个 React 元素第一次被转换成一个 Fiber 节点的时候，React 会通过 <a href="https://github.com/facebook/react/blob/769b1f270e1251d9dbdce0fcbd9e92e502d059b8/packages/react-reconciler/src/ReactFiber.js#L414" target="_blank" rel="noopener"><code>createFiberFromTypeAndProps</code></a> 函数来使用元素的信息来生成 Fiber 节点。在同步更新中，React 会重复使用 Fiber 节点，并根据与之相关的 React 元素上的数据来更新必要的属性。根据 <code>key</code> 属性，React 还可能会改变节点的层级。如果一个元素不再被 <code>render</code> 方法返回，React 会删除它。</p>
+<blockquote>
+<p>请参阅 <a href="https://github.com/facebook/react/blob/95a313ec0b957f71798a69d8e83408f40e76765b/packages/react-reconciler/src/ReactChildFiber.js#L239" target="_blank" rel="noopener"><code>ChildReconciler</code></a> 函数，它会列出所有的操作类型，以及对应的 React 会对 Fiber 节点进行的操作。</p>
+</blockquote>
+<p>由于 React 会为每个 React 元素都创建 Fiber 节点，且这些元素构成一棵树，我们会得到一棵树状结构的 Fiber 节点。譬如在我们的示例中，这棵树会像这样：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="./fiber-tree.png" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>通过 <code>child</code>、<code>sibling</code> 和 <code>return</code> 属性，所有 Fiber 节点会通过一个链表连接在一起。请参阅我的文章<a href="https://medium.com/dailyjs/the-how-and-why-on-reacts-usage-of-linked-list-in-fiber-67f1014d0eb7" target="_blank" rel="noopener">《React 在 Fiber 中使用链表的原因和方法》</a>来了解为什么要这么设计。</p>
+<h2 id="Current-树和-workInProgress-树"><a href="#Current-树和-workInProgress-树" class="headerlink" title="Current 树和 workInProgress 树"></a>Current 树和 workInProgress 树</h2><p>初次渲染完成后，React 会得到一棵代表当前 app 状态的树，并据此渲染 UI。我们通常把这棵树称作「<strong>current</strong>」。当 React 开始更新的时候，它会创建一棵名叫「<strong>workInProgress</strong>」的树，这棵树反映了用来刷新 UI 的新状态。</p>
+<p>所有对 Fiber 进行的操作都来自于 <code>workInProgress</code> 树。当 React 遍历  <code>current</code> 树的时候，对于每个 Fiber 节点，React 会创建一个新的节点（alternate），由这些 alternate 形成 <code>workInProgress</code> 树。新的节点使用 React 元素 <code>render</code> 方法返回的数据创建。在更新完成，所有的事务都结束后，React 会得到一棵 alternate 树，并可以刷新 UI。当 <code>workInProgress</code> 被渲染到屏幕，它就会取代先前的树，成为新的 <code>current</code> 树。</p>
+<p>React 的核心原则之一是连贯性。React 总是会一次性地更新 DOM，而不会仅渲染部分结果。<code>workInProgress</code> 树充当的就是一个不会对用户展示的「草稿」，所以 React 可以先处理所有的节点，再把所有的变更刷新到屏幕。</p>
+<p>在源码中，你可以找多从 <code>current</code> 和 <code>workInProgress</code> 树获取 Fiber 节点的函数，比如其中一个的函数签名如下：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">updateHostComponent</span>(<span class="params">current, workInProgress, renderExpirationTime</span>) </span>&#123;...&#125;</span><br></pre></td></tr></table></figure>
+<p>每个 Fiber 节点都在 <strong>alternate</strong> 字段中保存着另一棵树中它的副本： <code>current</code> 树中的指向 <code>workInProgress</code> 树中的，反之亦然。</p>
+<h2 id="副作用"><a href="#副作用" class="headerlink" title="副作用"></a>副作用</h2><p>我们可以把 React 组件都想象成函数，他们接收 state 和 props，并计算出对应的 UI 的描述。由此，任何其他的操作，如操作 DOM 或调用生命周期方法都可以看作副作用，简称作用。<a href="https://reactjs.org/docs/hooks-overview.html#effect-hook" target="_blank" rel="noopener">副作用</a>在文档中是这么描述的：</p>
+<blockquote>
+<p>你之前可能已经在 React 组件中执行过数据获取、订阅或者手动<strong>修改过 DOM</strong>。我们统一把这些操作称为“副作用”，或者简称为“作用”。</p>
+</blockquote>
+<p>由此可以看出大多数 state 和 props 的更新都会导致副作用的产生。由于实施副作用也是一种事务，Fiber 是追踪除了更新以外的副作用的一种很有力机制。每个 Fiber 节点都可以和副作用相关联，存储在 <code>effectTag</code> 字段中。</p>
+<p>所以，Fiber 中的副作用定义了更新完成后示例们需要进行的<strong><a href="https://github.com/facebook/react/blob/b87aabdfe1b7461e7331abb3601d9e6bb27544bc/packages/shared/ReactSideEffectTags.js" target="_blank" rel="noopener">事务</a></strong>。对于宿主节点（DOM 元素），事务包括添加、更新和删除元素。对于类组件，React 可能需要更新 refs 并调用 <code>componentDidMount</code> 以及 <code>componentDidUpdate</code> 等生命周期方法。其他的 Fiber 节点也都有它们对应的副作用。</p>
+<h2 id="副作用链表"><a href="#副作用链表" class="headerlink" title="副作用链表"></a>副作用链表</h2><p>React 处理更新的速度极快，为了达到这样的性能，它采用了许多很有趣的技术。<strong>其中之一便是构造一个带有副作用的 Fiber 节点组成的线形表，以此加快遍历速度。</strong>遍历一个线形表要比遍历一棵树快多了，而且这样（只有带副作用的 Fiber 节点才在链表中）可以避免在没有副作用的节点上浪费时间。</p>
+<p>这个链表的目的是标记所有需要更新 DOM 或其他副作用的节点。它是 <code>finishedWork</code> 树的子集，它使用 <code>current</code> 和 <code>workInProgress</code> 树节点中的 <code>nextEffect</code> 属性而不是 <code>child</code> 属性来做为指针。</p>
+<p><a href="https://medium.com/u/a3a8af6addc1" target="_blank" rel="noopener">Dan Abramov</a> 给出了一个副作用链表的比喻，他喜欢把它比作一棵圣诞树，树上挂小灯的电线把所有有副作用的节点都连在了一起。为了可视化这一过程，我们想象一下以下这棵 Fiber 节点树，其中桔红色的节点是有事务的。比如，我们的更新使得 <code>c2</code> 需要插入至 DOM，<code>d2</code> 和 <code>c1</code> 需要更新属性，<code>b2</code> 需要调用生命周期方法。副作用链表会将它们连在一起，因此 React 稍后可以跳过其他节点。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="./effect-link-in-tree.png" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>你现在知道带有副作用的节点是如何构成链表的了，当遍历节点的时候，React 会通过 <code>firstEffect</code> 指针来找出链表的第一个元素。因此上图可以像下图一样表示成一个线形表：</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="./effect-link.png" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<p>你可以看到，React 会依照先子节点再夫节点的顺序实施副作用。</p>
+<h2 id="Fiber-树的根"><a href="#Fiber-树的根" class="headerlink" title="Fiber 树的根"></a>Fiber 树的根</h2><p>每一个 React 都有一个或多个 DOM 元素作为容器。我们的示例中它是一个带有 <code>container</code> ID 的  <code>div</code> 元素：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> domContainer = <span class="built_in">document</span>.querySelector(<span class="string">'#container'</span>);</span><br><span class="line">ReactDOM.render(React.createElement(ClickCounter), domContainer);</span><br></pre></td></tr></table></figure>
+<p>React 会为每个容器创建一个 <a href="https://github.com/facebook/react/blob/0dc0ddc1ef5f90fe48b58f1a1ba753757961fc74/packages/react-reconciler/src/ReactFiberRoot.js#L31" target="_blank" rel="noopener"><code>fiberRoot</code></a> 元素，你可以通过对 DOM 元素的引用来访问它：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> fiberRoot = query(<span class="string">'#container'</span>)._reactRootContainer._internalRoot</span><br></pre></td></tr></table></figure>
+<p>这个 Fiber Root 就是 React 保存对 Fiber 树的引用的地方。它保存在 Fiber Root 的 <code>current</code> 属性中：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> hostRootFiberNode = fiberRoot.current</span><br></pre></td></tr></table></figure>
+<p>Fiber 树的根是一个具有<a href="https://github.com/facebook/react/blob/cbbc2b6c4d0d8519145560bd8183ecde55168b12/packages/shared/ReactWorkTags.js#L34" target="_blank" rel="noopener">特殊类型</a> <code>HostRoot</code> 的 Fiber 节点，React 会在内部创建它，并把它作为你最顶层组件的父节点。可以通过 <code>stateNode</code> 属性从 <code>HostRoot</code> 节点回到 <code>FiberRoot</code>：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fiberRoot.current.stateNode === fiberRoot; <span class="comment">// true</span></span><br></pre></td></tr></table></figure>
+<p>你可以从访问最顶层的 <code>HostRoot</code> 开始探索整棵 Fiber 树，或者你也可以像从一个组件实例获取一个单独的节点：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">compInstance._reactInternalFiber</span><br></pre></td></tr></table></figure>
+<h2 id="Fiber-节点的结构"><a href="#Fiber-节点的结构" class="headerlink" title="Fiber 节点的结构"></a>Fiber 节点的结构</h2><p>现在，我们来看看 <code>ClickCounter</code> 组件产出的 Fiber 节点：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  stateNode: <span class="keyword">new</span> ClickCounter,</span><br><span class="line">  type: ClickCounter,</span><br><span class="line">  alternate: <span class="literal">null</span>,</span><br><span class="line">  key: <span class="literal">null</span>,</span><br><span class="line">  updateQueue: <span class="literal">null</span>,</span><br><span class="line">  memoizedState: &#123;<span class="attr">count</span>: <span class="number">0</span>&#125;,</span><br><span class="line">  pendingProps: &#123;&#125;,</span><br><span class="line">  memoizedProps: &#123;&#125;,</span><br><span class="line">  tag: <span class="number">1</span>,</span><br><span class="line">  effectTag: <span class="number">0</span>,</span><br><span class="line">  nextEffect: <span class="literal">null</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>以及 DOM 元素 <code>span</code>：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  stateNode: <span class="keyword">new</span> HTMLSpanElement,</span><br><span class="line">  type: <span class="string">"span"</span>,</span><br><span class="line">  alternate: <span class="literal">null</span>,</span><br><span class="line">  key: <span class="string">"2"</span>,</span><br><span class="line">  updateQueue: <span class="literal">null</span>,</span><br><span class="line">  memoizedState: <span class="literal">null</span>,</span><br><span class="line">  pendingProps: &#123;<span class="attr">children</span>: <span class="number">0</span>&#125;,</span><br><span class="line">  memoizedProps: &#123;<span class="attr">children</span>: <span class="number">0</span>&#125;,</span><br><span class="line">  tag: <span class="number">5</span>,</span><br><span class="line">  effectTag: <span class="number">0</span>,</span><br><span class="line">  nextEffect: <span class="literal">null</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Fiber节点中有许许多多的字段，前边我已经解释过 <code>alternate</code>、<code>effectTag</code> 和 <code>nextEffect</code> 的作用了。我们来看看其他的：</p>
+<ul>
+<li><code>stateNode</code> 保存着对 Fiber 节点对应的组件实例、DOM 节点或其他 React 元素的引用。通常我们认为这个属性保存了 Fiber 对应的本地状态；</li>
+<li><code>type</code>定义了 Fiber 对应的函数或类。对于类组件，它指向构造函数；对于 DOM 元素，它是 HTML 标签。我经常用这个字段来确定一个 Fiber 节点对应的元素。</li>
+<li><code>tag</code> 定义了 <a href="https://github.com/facebook/react/blob/769b1f270e1251d9dbdce0fcbd9e92e502d059b8/packages/shared/ReactWorkTags.js" target="_blank" rel="noopener">Fiber 的类型</a>。在协调算法中，它被用于确定需要完成的事务是什么。上面说到过，不同的 React 元素会对应不同的事务。<a href="https://github.com/facebook/react/blob/769b1f270e1251d9dbdce0fcbd9e92e502d059b8/packages/react-reconciler/src/ReactFiber.js#L414" target="_blank" rel="noopener"><code>createFiberFromTypeAndProps</code></a> 函数会把一个 React 元素映射成对应的 Fiber 节点。在我们的示例 app 中，<code>ClickCounter</code> 的 <code>tag</code> 属性的值是 <code>1</code>，代表 <code>ClassComponent</code>；而 <code>span</code>元素则是 <code>5</code>，代表 <code>HostComponent</code>。</li>
+<li><code>updateQueue</code> 是一个状态更新、回调函数和 DOM 更新组成的队列；</li>
+<li><code>memoizedState</code> 是 Fiber 上一次渲染中用来创建输出的 state，当触发更新时，它代表着当前 UI 显示着的 state；</li>
+<li><code>memoizedProps</code> 则是 Fiber 上一次渲染中用来创建输出的 props；</li>
+<li><code>pendingProps</code> 是 React 元素已经完成更新后新的数据产生的 props，它会被应用于子组件或 DOM 元素；</li>
+<li><code>key</code> 是一个唯一的标识符，用于让 React 分辨哪些元素发生了变化（从列表中增加或删除）。它与 React 的列表渲染有关，请参阅<a href="https://reactjs.org/docs/lists-and-keys.html#keys" target="_blank" rel="noopener">这里</a>。</li>
+</ul>
+<p>你可以在<a href="https://github.com/facebook/react/blob/6e4f7c788603dac7fccd227a4852c110b072fe16/packages/react-reconciler/src/ReactFiber.js#L78" target="_blank" rel="noopener">这里</a>找到完整的 Fiber 节点的结构。我删掉了许多前文已经提到过的字段，跳过了<a href="https://medium.com/dailyjs/the-how-and-why-on-reacts-usage-of-linked-list-in-fiber-67f1014d0eb7" target="_blank" rel="noopener">上一篇文章中说过的</a>用于组成树状结构的 <code>child</code>, <code>sibling</code> 和 <code>return</code> 字段，一些 <code>Scheduler</code> 专用的字段如 <code>expirationTime</code>、<code>childExpirationTime</code> 和 <code>mode</code> 也没有被提及。</p>
+<h1 id="算法概况"><a href="#算法概况" class="headerlink" title="算法概况"></a>算法概况</h1><p>React 的事务执行过程分为两个部分：<strong>渲染（render）</strong>和<strong>提交（commit）</strong>。</p>
+<p>在第一个阶段 <code>render</code> 中，React 会把更新应用于通过 <code>setState</code> 或 <code>React.render</code> 排好期的组件，并分析出 UI 中需要更新的部分。如果是初次渲染，React 会为 <code>render</code> 方法返回的每个元素都创建一个新的 Fiber 节点。在接下来的更新中，已经存在的 React 元素的 Fiber 将会被复用并更新。<strong>这一阶段的结果是由标记了副作用的 Fiber 节点构成的一棵树。</strong>这些副作用描述了在接下来的 <code>commit</code> 阶段需要进行的事务。在这一阶段中，React 会把接收标有副作用的 Fiber 树，并把它应用到实例上。React 会遍历副作用链表，并把 DOM 更新等操作呈现给用户。</p>
+<p><strong>有一件事很重要：在第一阶段过程 <code>render</code> 中的事务是可以异步执行的。</strong>React 可以根据可用时间的多少，在处理一个完或多个 Fiber 节点后停下来，暂存已经完成的事务，并发送一些事件，然后再从刚刚停下的地方继续。虽然有的时候它还是需要舍弃之前的结果然后从头再来。这种暂停得以实现的原因是，实施这些事务并没有产生类似于 DOM 更新之类的任何用户可见的更改。<strong>相反地，下一个阶段 <code>commit</code> 永远是同步执行的</strong>。这是因为这一阶段产生的结果对用户是可见的，比如更新 DOM，所以 React 需要将其一次性做完。</p>
+<p>调用生命周期方法是 React 需要执行的事务之一。有些方式是在  <code>render</code> 阶段执行的，而有些则是在 <code>commit</code>阶段。在第一阶段 <code>render</code> 中会被调用的方法有：</p>
+<ul>
+<li><code>[UNSAFE_]componentWillMount</code> (已废弃)</li>
+<li><code>[UNSAFE_]componentWillReceiveProps</code> (已废弃)</li>
+<li><code>getDerivedStateFromProps</code></li>
+<li><code>shouldComponentUpdate</code></li>
+<li><code>[UNSAFE_]componentWillUpdate</code> (已废弃)</li>
+<li><code>render</code></li>
+</ul>
+<p>如你所见，自 v16.3 开始，有些历史遗留的 <code>render</code> 阶段生命周期方法被标记了 <code>UNSAFE</code>，在文档中它们被称作历史遗留生命周期方法。他们会在将来的某个 16.x 发布中被废弃，而它们没有 <code>UNSAFE</code> 的副本也将在 17.0 中被移除。你可以在<a href="https://reactjs.org/blog/2018/03/27/update-on-async-rendering.html" target="_blank" rel="noopener">这里</a>了解到这些变更以及推荐的迁移路径。</p>
+<p>你对这种变更的原因感到困惑吗？</p>
+<p>好吧，我们刚刚说到 <code>render</code> 阶段并不产生如更新 DOM 的副作用，因此 React 可以异步地处理组件的更新（甚至在多个线程中完成）。然而，标记为  <code>UNSAFE</code> 的生命周期方法常常被误解和轻微地误用。开发者们倾向于把带有副作用的代码放置于这些方法中，这会导致全新的异步渲染实现产生问题。尽管只是没有 <code>UNSAFE</code> 的副本会被移除，这些方法仍可能在即将退出的的并发模式中导致问题（不过你可以选择不用这种模式）。</p>
+<p>以下列表为会在 <code>commit</code> 阶段被调用的方法：</p>
+<ul>
+<li><code>getSnapshotBeforeUpdate</code></li>
+<li><code>componentDidMount</code></li>
+<li><code>componentDidUpdate</code></li>
+<li><code>componentWillUnmount</code></li>
+</ul>
+<p>因为这些方法会在同步的 <code>commit</code> 阶段被调用，它们可以包含副作用，以及操作 DOM。</p>
+<p>好的，现在我们已经了解完了背景，并看完了遍历树和实施事务的算法的基本概况，是时候继续深究了。</p>
+<h1 id="Render-阶段"><a href="#Render-阶段" class="headerlink" title="Render 阶段"></a>Render 阶段</h1><p>协调算法始终会通过调用 <a href="https://github.com/facebook/react/blob/95a313ec0b957f71798a69d8e83408f40e76765b/packages/react-reconciler/src/ReactFiberScheduler.js#L1132" target="_blank" rel="noopener">renderRoot</a> 函数，从最顶层的 <code>HostRoot</code> Fiber 节点开始。然而，React 会跳过已经处理过的 Fiber 节点，直到它找到了还有尚未完成事务的节点。例如，如果你在组件树的较深位置调用了 <code>setState</code>，React 将还是从顶开始，不过会快速地跳过各个父组件，直到它找到了 <code>setState</code> 被调用的那个组件。</p>
+<h2 id="事务循环的主要流程"><a href="#事务循环的主要流程" class="headerlink" title="事务循环的主要流程"></a>事务循环的主要流程</h2><p>所有节点都在<a href="https://github.com/facebook/react/blob/f765f022534958bcf49120bf23bc1aa665e8f651/packages/react-reconciler/src/ReactFiberScheduler.js#L1136" target="_blank" rel="noopener">事务循环中</a>被处理，以下是同步版的事务循环的实现：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">workLoop</span>(<span class="params">isYieldy</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (!isYieldy) &#123;</span><br><span class="line">    <span class="keyword">while</span> (nextUnitOfWork !== <span class="literal">null</span>) &#123;</span><br><span class="line">      nextUnitOfWork = performUnitOfWork(nextUnitOfWork);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;...&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在以上的代码中，<code>nextUnitOfWork</code> 引用着 <code>workInProgress</code> 树中带有事务的 Fiber 节点。React 取回 Fiber 树时，它会使用这个变量来检查是否还有其他带有未完成事务的 Fiber 节点。这个过程结束后，这个变量要不然是下一个 Fiber 节点，要不然就是 <code>null</code>，若是后者，React 就会退出事务循环，并可以提交这些改动了。</p>
+<p>React 中主要有 4 个函数用来取回整棵树和完成事务：</p>
+<ul>
+<li><a href="https://github.com/facebook/react/blob/95a313ec0b957f71798a69d8e83408f40e76765b/packages/react-reconciler/src/ReactFiberScheduler.js#L1056" target="_blank" rel="noopener"><code>performUnitOfWork</code></a></li>
+<li><a href="https://github.com/facebook/react/blob/cbbc2b6c4d0d8519145560bd8183ecde55168b12/packages/react-reconciler/src/ReactFiberBeginWork.js#L1489" target="_blank" rel="noopener"><code>beginWork</code></a></li>
+<li><a href="https://github.com/facebook/react/blob/95a313ec0b957f71798a69d8e83408f40e76765b/packages/react-reconciler/src/ReactFiberScheduler.js#L879" target="_blank" rel="noopener"><code>completeUnitOfWork</code></a></li>
+<li><a href="https://github.com/facebook/react/blob/cbbc2b6c4d0d8519145560bd8183ecde55168b12/packages/react-reconciler/src/ReactFiberCompleteWork.js#L532" target="_blank" rel="noopener"><code>completeWork</code></a></li>
+</ul>
+<p>为了演示它们的工作方法，请看一下下边这个动图，它描述了取回 Fiber 树的过程。出于演示的目的，我在这儿使用的是这些函数的简化版本实现，每个函数接收并处理一个 Fiber 节点。React 向下处理的过程中，你可以看到活动的 Fiber 节点也发生了变化。在动图中可以很清楚地看这个算法是如何从一棵子树跳到另一棵的：它会先完成事务，再返回父节点。</p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="./algo.gif" alt title>
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+<blockquote>
+<p>备注：竖直方向的连线代表的是兄弟节点，而拐弯的连线代表父子。例如 <code>b1</code> 没有子节点，而 <code>b2</code> 有一个子节点 <code>c1</code>。</p>
+</blockquote>
+<p>上面的动图<a href="https://vimeo.com/302222454" target="_blank" rel="noopener">在这儿有一个视频版本</a>，以便你暂停和回放，并观察当前节点和函数的状态。理论上，你可以把 <code>beginWork</code> 想象成「进入」一个组件，而 <code>completeWork</code> 就是「退出」了。你可以<a href="https://stackblitz.com/edit/js-ntqfil?file=index.js" target="_blank" rel="noopener">在这里玩一玩示例实现</a>。</p>
+<p>让我们从前两个函数 <code>performUnitOfWork</code> 和 <code>beginWork</code> 开始：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">performUnitOfWork</span>(<span class="params">workInProgress</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">let</span> next = beginWork(workInProgress);</span><br><span class="line">  <span class="keyword">if</span> (next === <span class="literal">null</span>) &#123;</span><br><span class="line">    next = completeUnitOfWork(workInProgress);</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">return</span> next;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">beginWork</span>(<span class="params">workInProgress</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'work performed for '</span> + workInProgress.name);</span><br><span class="line">  <span class="keyword">return</span> workInProgress.child;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>performUnitOfWork</code> 是 Fiber 中所有操作开始的地方，它接收一个 <code>workInProgress</code> 树中的 Fiber 节点，并通过调用 <code>beginWork</code> 函数来开始事务。为了演示，我们此处就简单地把 Fiber 的名字 log 出来，然后标记这个节点为事务已完成。<strong><code>beginWork</code> 函数始终会返回循环中下一个待处理的节点或 <code>null</code></strong>。</p>
+<p>如果下一个子节点存在，它会在 <code>workLoop</code> 函数中被赋值给 <code>nextUnitOfWork</code> 变量。然而，如果没有子节点，React 就知道它已经到达了子树的底端，因此可以完成对这个节点的操作。<strong>在这个节点完成后，React 会操作它的兄弟节点，并返回其父节点。</strong>这些工作是在 <code>completeUnitOfWork</code> 函数中完成的：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">completeUnitOfWork</span>(<span class="params">workInProgress</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">    <span class="keyword">let</span> returnFiber = workInProgress.return;</span><br><span class="line">    <span class="keyword">let</span> siblingFiber = workInProgress.sibling;</span><br><span class="line"></span><br><span class="line">    nextUnitOfWork = completeWork(workInProgress);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (siblingFiber !== <span class="literal">null</span>) &#123;</span><br><span class="line">      <span class="comment">// 如果存在兄弟节点，会将它返回以对它进行操作</span></span><br><span class="line">      <span class="keyword">return</span> siblingFiber;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (returnFiber !== <span class="literal">null</span>) &#123;</span><br><span class="line">      <span class="comment">// 如果 `returnFiber` 中没有更多事务了，会返回循环并完成父节点</span></span><br><span class="line">      workInProgress = returnFiber;</span><br><span class="line">      <span class="keyword">continue</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">      <span class="comment">// 到顶了！</span></span><br><span class="line">      <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">completeWork</span>(<span class="params">workInProgress</span>) </span>&#123;</span><br><span class="line">  <span class="built_in">console</span>.log(<span class="string">'work completed for '</span> + workInProgress.name);</span><br><span class="line">  <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到，这个函数的主旨就是一个大大的 <code>while</code> 循环。<code>workInProgress</code> 中的节点没有子节点的时候，React 就会进入这个函数。</p>
+<p>在当前 Fiber 的事务结束后，React 会检查它是否有兄弟节点，如果有，React 会退出函数，并把兄弟节点返回。这个兄弟节点会被赋值给 <code>nextUnitOfWork</code> 变量，React 会从这个兄弟节点开始实施事务。有一点很重要：此时此刻 React 仅仅完成了先前兄弟节点的事务，它还没有对父节点实施事务。<strong>只有从子节点开始的当所有分支都结束了，它才会开始完成父节点的事务，并原路返回。</strong></p>
+<p>从实现中可以发现，<code>performUnitOfWork</code> 和 <code>completeUnitOfWork</code> 主要是用来进行迭代的，而真正的操作发生在 <code>beginWork</code> 和 <code>completeWork</code> 函数中。本系列的下一篇文章中我们将会了解 React 进入  <code>beginWork</code> 和 <code>completeWork</code> 函数的时候，<code>ClickCounter</code> 组件和 <code>span</code> 节点会发生什么。</p>
+<h1 id="Commit-阶段"><a href="#Commit-阶段" class="headerlink" title="Commit 阶段"></a>Commit 阶段</h1><p>这一阶段从 <a href="https://github.com/facebook/react/blob/95a313ec0b957f71798a69d8e83408f40e76765b/packages/react-reconciler/src/ReactFiberScheduler.js#L2306" target="_blank" rel="noopener"><code>completeRoot</code></a>函数开始。这也是 React 更新 DOM，并调用挂载前后的生命周期方法的地方。</p>
+<p>进入这一阶段时，React 会保存着两棵树和副作用链表。第一棵树代表着当前 UI 中的 state；第二棵则是 <code>render</code> 阶段中产生的 alternate 树，源码中叫做 <code>finishedWork</code> 或 <code>workInProgress</code> 树，代表着 UI 中需要渲染的 state。和 current 树一样，这棵 alternate 树也是由 <code>child</code> 和 <code>sibling</code> 指针连起来的。</p>
+<p>接下来是副作用链表——通过 <code>nextEffect</code> 指针连起来的 <code>finishedWork</code> 树。请记住副作用链表是运行 <code>render</code> 阶段的<em>结果</em>，该链表的目的描述需要插入、更新或删除的节点，以及需要调用生命周期方法的组件。<strong>而这个链表中的节点就是 coomit 阶段中会被迭代的。</strong></p>
+<blockquote>
+<p>出于 debug 的目的，<code>current</code> 树可以从 <code>FiberRoot</code> 节点的 <code>current</code> 属性中访问到，<code>finishedWork</code> 树可以从 <code>HostFiber</code> 节点的 <code>alternate</code> 属性访问到。</p>
+</blockquote>
+<p>Commit 阶段的核心函数是 <a href="https://github.com/facebook/react/blob/95a313ec0b957f71798a69d8e83408f40e76765b/packages/react-reconciler/src/ReactFiberScheduler.js#L523" target="_blank" rel="noopener"><code>commitRoot</code></a>，它做的事情基本上是：</p>
+<ul>
+<li>在被标记了 <code>SnapShot</code> 副作用的节点上调用  <code>getSnapshotBeforeUpdate</code> 生命周期方法；</li>
+<li>在被标记了 <code>Deletion</code> 副作用的节点上调用 <code>componentWillUnmount</code> 生命周期方法；</li>
+<li>进行 DOM 的增删改；</li>
+<li>把 <code>finishedWork</code> 树设置为新的 current 树；</li>
+<li>在被标记了 <code>Placement</code> 副作用的节点上调用 <code>componentDidMount</code> 生命周期方法；</li>
+<li>在被标记了 <code>Update</code> 副作用的节点上调用 <code>componentDidUpdate</code> 生命周期方法。</li>
+</ul>
+<p>在调用了挂载前生命周期函数 <code>getSnapshotBeforeUpdate</code> 后，React 会提交树中所有的副作用，这一步有两个阶段。第一阶段会执行所有的 DOM（宿主元素）的插入、更新、删除以及 ref 的卸载。然后 React 会把 <code>finishedWork</code> 树分配给 <code>FiberRoot</code>，并把 <code>workInProgress</code> 树标记为 <code>current</code> 树。这一过程是在第一次 commit 阶段完成后以及第二次 commit 完成前进行的，所以前一棵树还在进行 <code>componentWillUnmount</code>，而 <code>finishedWork</code> 树正在执行 <code>componentDidMount/Update</code>；第二阶段 React 会调用其他所有的生命周期方法，和 ref 回调。这些方法会分成好几轮，以确保所有的替换、更新和删除都顺利执行了。</p>
+<p>下边是一个实现了上述过程主旨的函数实现：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">commitRoot</span>(<span class="params">root, finishedWork</span>) </span>&#123;</span><br><span class="line">  commitBeforeMutationLifecycles()</span><br><span class="line">  commitAllHostEffects();</span><br><span class="line">  root.current = finishedWork;</span><br><span class="line">  commitAllLifeCycles();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面的每一个子函数都实现了一个循环，从而迭代副作用链表，并检测副作用的类型。当它找到与本函数有关的副作用的时候就会执行。</p>
+<h2 id="挂载前生命周期方法"><a href="#挂载前生命周期方法" class="headerlink" title="挂载前生命周期方法"></a>挂载前生命周期方法</h2><p>下边是一个例子，其中的代码会对副作用树进行迭代并检测节点是否带有 <code>Spapshot</code> 副作用：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">commitBeforeMutationLifecycles</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">while</span> (nextEffect !== <span class="literal">null</span>) &#123;</span><br><span class="line">    <span class="keyword">const</span> effectTag = nextEffect.effectTag;</span><br><span class="line">    <span class="keyword">if</span> (effectTag &amp; Snapshot) &#123;</span><br><span class="line">      <span class="keyword">const</span> current = nextEffect.alternate;</span><br><span class="line">      commitBeforeMutationLifeCycles(current, nextEffect);</span><br><span class="line">    &#125;</span><br><span class="line">    nextEffect = nextEffect.nextEffect;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>对于一个类组件，这个副作用意味着调用 <code>getSnapshotBeforeUpdate</code>。</p>
+<h2 id="DOM-更新"><a href="#DOM-更新" class="headerlink" title="DOM 更新"></a>DOM 更新</h2><p><a href="https://github.com/facebook/react/blob/95a313ec0b957f71798a69d8e83408f40e76765b/packages/react-reconciler/src/ReactFiberScheduler.js#L376" target="_blank" rel="noopener"><code>commitAllHostEffects</code></a> 函数是 React 更新 DOM 的地方。这个函数基本上就是定义了需要进行的操作的种类，并执行之：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">commitAllHostEffects</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">switch</span> (primaryEffectTag) &#123;</span><br><span class="line">    <span class="keyword">case</span> Placement: &#123;</span><br><span class="line">      commitPlacement(nextEffect);</span><br><span class="line">      ...</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">case</span> PlacementAndUpdate: &#123;</span><br><span class="line">      commitPlacement(nextEffect);</span><br><span class="line">      commitWork(current, nextEffect);</span><br><span class="line">      ...</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">case</span> Update: &#123;</span><br><span class="line">      commitWork(current, nextEffect);</span><br><span class="line">      ...</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">case</span> Deletion: &#123;</span><br><span class="line">      commitDeletion(nextEffect);</span><br><span class="line">      ...</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>React 会在 <code>commitDeletion</code> 函数中调用 <code>componentWillUnmount</code> 方法，这还怪好玩的。</p>
+<h2 id="挂载后生命周期方法"><a href="#挂载后生命周期方法" class="headerlink" title="挂载后生命周期方法"></a>挂载后生命周期方法</h2><p><a href="https://github.com/facebook/react/blob/95a313ec0b957f71798a69d8e83408f40e76765b/packages/react-reconciler/src/ReactFiberScheduler.js#L465" target="_blank" rel="noopener"><code>commitAllLifecycles</code></a> 是 React 调用所有剩余的生命周期函数的地方，如 <code>componentDidUpdate</code> 和 <code>componentDidMount</code>。</p>
+<hr>
+<p>终于结束了！如果你对这篇文章有任何问题，请在评论中写出。<strong>你也可以看看本系列的下一篇<a href="https://medium.com/react-in-depth/in-depth-explanation-of-state-and-props-update-in-react-51ab94563311" target="_blank" rel="noopener">《深入探索 React 的 state 和 props 更新机制》</a>。</strong>我还有许多关于调度器、子协调过程和副作用列表构建过程的文章正在写作中，我还有创作一个以这篇文章为基础的 debug 心得分享的视频。</p>
+<p><strong>血都要获得更多信息，请在 <a href="https://twitter.com/maxkoretskyi" target="_blank" rel="noopener">Twitter</a> 和 <a href="https://medium.com/@maxim.koretskyi" target="_blank" rel="noopener">Medium</a> 关注我。感谢你的阅读！如果你喜欢这篇文章，请给我点个鼓掌 👏。这对我大有帮助，而且可以让更多的人看到这篇文章。</strong></p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2019-07-22T03:17:57.952Z" itemprop="dateUpdated">2019-07-22 11:17:57</time>
+</span><br>
+
+
+        
+    </div>
+    
+    <footer>
+        <a href="https://sr2k.top/blog">
+            <img src="data:image/jpeg;base64,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" alt="Siyuan Cao">
+            Siyuan Cao
+        </a>
+    </footer>
+</blockquote>
+
+        
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/JavaScript/">JavaScript</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/React/">React</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/blog/tags/翻译/">翻译</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://sr2k.top/blog/2019/07/22/译-Fiber-深入了解React的全新调度算法/&title=《【译】Fiber：深入了解 React 的全新调度算法》 — SR2k&pic=https://sr2k.top/blogdata:image/jpeg;base64,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" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://sr2k.top/blog/2019/07/22/译-Fiber-深入了解React的全新调度算法/&title=《【译】Fiber：深入了解 React 的全新调度算法》 — SR2k&source=Siyuan 先生の日常杂杂碎" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://sr2k.top/blog/2019/07/22/译-Fiber-深入了解React的全新调度算法/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《【译】Fiber：深入了解 React 的全新调度算法》 — SR2k&url=https://sr2k.top/blog/2019/07/22/译-Fiber-深入了解React的全新调度算法/&via=https://sr2k.top/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://sr2k.top/blog/2019/07/22/译-Fiber-深入了解React的全新调度算法/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between flex-row-reverse">
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/blog/2019/07/19/arrow-functions/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">箭头函数</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/blog/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>Siyuan Cao &copy; 2015 - 2019</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=https://sr2k.top/blog/2019/07/22/译-Fiber-深入了解React的全新调度算法/&title=《【译】Fiber：深入了解 React 的全新调度算法》 — SR2k&pic=https://sr2k.top/blogdata:image/jpeg;base64,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" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=https://sr2k.top/blog/2019/07/22/译-Fiber-深入了解React的全新调度算法/&title=《【译】Fiber：深入了解 React 的全新调度算法》 — SR2k&source=Siyuan 先生の日常杂杂碎" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=https://sr2k.top/blog/2019/07/22/译-Fiber-深入了解React的全新调度算法/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《【译】Fiber：深入了解 React 的全新调度算法》 — SR2k&url=https://sr2k.top/blog/2019/07/22/译-Fiber-深入了解React的全新调度算法/&via=https://sr2k.top/blog" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=https://sr2k.top/blog/2019/07/22/译-Fiber-深入了解React的全新调度算法/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAN4AAADeCAAAAAB3DOFrAAACuklEQVR42u3aMXLjMAwF0Nz/0s7Mto6kD4DYUfFYeeKY4mNBUAB+fuLx+Teu/v797edrXM1zNfP9PIcHHh4eXmvpV+N7EffUhJcv+n4N0Wx4eHh4a7x86uRAz3+Vb2J1i/Hw8PDewOsFjP9zNcfDw8N7J6+33FPhAQ8PD+9tvCQZkT84TzrkG7Sea8HDw8OrPaVQAHvD58X6Hh4eHt6gqp4cu0nC4j7pUL12F9aJh4eHt8C7f8AkIZtgesEgT+ni4eHh7fGqidH5X3qfk3AyylXj4eHhBbw8aZu/9Z/6NmljfQgSeHh4eGu8av6zd/Qnl+NeOe2hsoeHh4d3lNdrlsqnSw73pFFg3qCAh4eHd4qXN071yl1nL+7VcIKHh4e3wTvbaHXqV/PyGx4eHt4eb95KlV+7q4Dkqv2Q4MDDw8Nb4OWJgPzymqcYJqmK+5aCwg7h4eHhLfB6qdtqz1e+6Oq3eHh4eBu8apZishEHanTFQIWHh4d3lpc3XeUL6qUnkk0phxw8PDy8BV7+Sp8sJYk/vUaESYMCHh4e3gbv7KFfbavKi2rHkhF4eHh4A17emZUf1nkBrNekVQgteHh4eMu8aiTpNQFUN6vasHWZa8HDw8M7ysuTCFVGjumFqIfXADw8PLwF3v0U1UUky2pejouJDzw8PLxtXt7M1Ft0/uBqeOg1aeHh4eHNeZ9gTJIO+cx561WhJQsPDw9vjdc7iKsBIw8V1Wh2+f94eHh4R3mf4sibovIrcnLcV1Mkf2Sp8fDw8A7x5lFlcgnulbvy5gY8PDy8Pd4kGEyu1MlC54UxPDw8vD1eUgDrbUdyiE+uxQ+pDTw8PLyX8U41YM2buppvA3h4eHjLvOo1OufNExYHAgMeHh5ekddrikqSFPkl+FQKAw8PD2+b1yuA5UfzqTLYIhIPDw8v5f0CDWZzqAWK59gAAAAASUVORK5CYII=" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/blog/', SHARE: true, REWARD: false };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+});
+</script>
+
+<script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" async></script>
+
+
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+</body>
+</html>
