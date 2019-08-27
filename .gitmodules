@@ -1,3 +1,6 @@
 [submodule "themes/indigo"]
 	path = themes/indigo
 	url = git@github.com:yscoder/hexo-theme-indigo.git
+[submodule "themes/cactus"]
+	path = themes/cactus
+	url = git@github.com:probberechts/hexo-theme-cactus.git
